@@ -199,3 +199,7 @@ test('rail and main respect left/right safe-area insets (landscape notch)', () =
   assert.match(rule('main'), /safe-area-inset-left/);
   assert.match(rule('main'), /safe-area-inset-right/);
 });
+
+test('the hidden attribute wins over component display rules', () => {
+  assert.match(CSS, /\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}/);
+});
