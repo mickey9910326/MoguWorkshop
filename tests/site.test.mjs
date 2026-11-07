@@ -98,7 +98,7 @@ test('NAV_ITEMS internal hrefs resolve the same way', () => {
 
 test('main content is in the HTML, not injected by JS', () => {
   const home = pages.find((p) => p.path === '/').html;
-  for (const text of ['魔古工坊', 'mogugi', 'mabilat', '人偶傷害計算機', '加入伺服器', 'https://discord.gg/SUvwdmwfmm']) {
+  for (const text of ['魔古工坊', 'mogugi', 'mabilat', '人偶傷害計算機', '加入伺服器', 'https://discord.gg/AjAuanA8V']) {
     assert.ok(home.includes(text), `home: ${text}`);
   }
   assert.ok(home.includes('傷害計量器，並附有物品索引、狀態機制提醒、戰鬥記錄等功能。'), 'home: mogugi blurb');

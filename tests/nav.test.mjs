@@ -40,7 +40,7 @@ test('readCollapsed', () => {
 });
 
 test('constants', () => {
-  assert.equal(DISCORD_URL, 'https://discord.gg/SUvwdmwfmm');
+  assert.equal(DISCORD_URL, 'https://discord.gg/AjAuanA8V');
   assert.deepEqual(THEME_LABEL, { auto: '主題：自動', light: '主題：淺色', dark: '主題：深色' });
 });
 
