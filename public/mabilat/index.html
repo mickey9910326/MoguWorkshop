@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>mabilat 即時延遲・魔古工坊</title>
+<meta name="description" content="瑪奇台服各頻道的即時網路延遲與爆PING，每 5 秒更新。資料來自單一家用網路，僅供參考。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="魔古工坊">
+<meta property="og:title" content="mabilat 即時延遲・魔古工坊">
+<meta property="og:description" content="瑪奇台服各頻道的即時網路延遲與爆PING，每 5 秒更新。資料來自單一家用網路，僅供參考。">
+<link rel="icon" href="/_shared/img/mogu-chicken-32.png" type="image/png">
+<link rel="apple-touch-icon" href="/_shared/img/mogu-chicken-180.png">
+<meta property="og:image" content="https://mabinogi.elden-mogu.com/_shared/img/mogu-chicken-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="/_shared/theme.js"></script>
+<link rel="stylesheet" href="/_shared/site.css">
+<link rel="stylesheet" href="/_shared/mabilat/mabilat.css">
+<script type="module" src="/_shared/nav.js"></script>
+<script type="module" src="/_shared/mabilat/page.js"></script>
+</head>
+<body>
+<em-nav current="mabilat"></em-nav>
+<main class="wide">
+  <header class="ml-head">
+    <h1>mabilat 即時延遲 <span class="badge">測試中</span></h1>
+    <span class="sub" id="sub">載入中…</span>
+  </header>
+  <p class="intro">瑪奇台服各頻道的網路延遲，以不登入的 PING 連線量測，每 0.5 秒量測一次。資料來自單一家用網路(中華電信IP)，只代表這條線路，僅供參考</p>
+  <div class="notice" role="note">
+    <span class="icon" aria-hidden="true">⚠</span>
+    <div>
+      <p><b>各指標仍在測試中，目前只能反映這條網路線路的狀況，無法用來判斷頻道或伺服器的好壞。</b></p>
+      <p>延遲與爆PING 主要取決於連線被分配到的網路路徑，同一個頻道重新連線，結果就可能不同。</p>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="seg" id="f-server" role="group" aria-label="伺服器"></div>
+    <div class="seg" id="f-window" role="group" aria-label="時間範圍"></div>
+    <span class="err" id="err"></span>
+  </div>
+
+  <section class="card">
+    <details class="fold" open>
+      <summary><h2>頻道</h2></summary>
+      <p class="desc">大字是 p50（平常的 ping）；右上角是爆PING 機率：每 1000 次 PING 中，延遲 ≥ 100 ms 的次數。</p>
+      <div class="legend lvl-legend" id="lvl-legend"></div>
+      <details class="note">
+        <summary>說明</summary>
+        <ul>
+          <li>PING：每個頻道保持一條連線，每 0.5 秒送一個小封包，伺服器原樣回傳，量來回時間。</li>
+          <li>爆PING：延遲 ≥ 100 ms。實測幾乎都是封包掉了、等重傳補回，會卡約 0.3 秒；遊戲走 TCP，一個封包掉了後面都得等，所以跟體感卡頓最相關。</li>
+          <li>爆PING 機率用千分比（‰），不受時間範圍與 PING 間隔影響，比較頻道看這個；少於 600 次 PING 時不分級。</li>
+          <li>p50、p95 是整段時間範圍內所有 PING 合計的統計；近一天的數值由直方圖推估，誤差約 2%。</li>
+          <li>「全域」爆PING：多個頻道在同一秒同時發生，多半是本機線路的問題，與頻道無關。</li>
+        </ul>
+      </details>
+      <div class="tiles" id="tiles"></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details class="fold" open>
+      <summary><h2 id="heat-title">每分鐘爆PING 次數</h2></summary>
+      <p class="desc">一列一個頻道、一格<span id="heat-unit">一分鐘</span>。一小時以內顏色越深爆PING 越多；近一天每格改用爆PING 機率，由綠到紅分級。點頻道名或格子看該頻道的時間軸。</p>
+      <div class="heat-wrap"><div class="heat" id="heat"></div></div>
+      <div class="legend" id="legend"></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details class="fold" open>
+      <summary><h2 id="p95-title">每分鐘 p95</h2></summary>
+      <p class="desc">一格是該時段的 p95（95% 的 PING 低於這個值），顏色越深越慢；用來看平常延遲的穩定度，爆PING 請看上一張。</p>
+      <div class="heat-wrap"><div class="heat" id="heat95"></div></div>
+      <div class="legend" id="legend95"></div>
+    </details>
+  </section>
+
+  <section class="card" id="timeline">
+    <details class="fold" open>
+      <summary><h2 id="tl-title">爆PING 時間軸</h2></summary>
+      <p class="desc"><span class="c-series">━</span> 每個時段的 p50　<span class="c-critical">▮</span> 背景直條：該時段有爆PING（顏色同熱度圖；一小時以內 2 次以上標數字）</p>
+      <div class="stats" id="tl-stats"></div>
+      <div id="tl-chart"><div class="empty">點選一個頻道</div></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details class="fold">
+      <summary><h2>爆PING 紀錄 <span class="count" id="peaks-count"></span></h2></summary>
+      <div class="scroll-x"><table id="peaks"></table></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details class="fold">
+      <summary><h2>表格檢視 <span class="count" id="table-count"></span></h2></summary>
+      <div class="scroll-x"><table id="table"></table></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details class="fold">
+      <summary><h2>連線事件 <span class="count" id="events-count"></span></h2></summary>
+      <ul class="events" id="events"></ul>
+    </details>
+  </section>
+  <noscript><p class="err">這個頁面需要 JavaScript 才能顯示即時資料。</p></noscript>
+
+  <footer>魔古工坊 · 非官方玩家工具，與遊戲營運商無關</footer>
+</main>
+<div id="tip" role="tooltip"></div>
+</body>
+</html>

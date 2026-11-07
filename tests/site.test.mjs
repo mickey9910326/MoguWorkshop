@@ -11,7 +11,7 @@ const PUBLIC = join(ROOT, 'public');
 const HOST = 'mabinogi.elden-mogu.com';
 
 // Paths on this host that are served by something other than this site.
-export const ALLOWED_ORIGIN_PATHS = ['/mabilat/'];
+export const ALLOWED_ORIGIN_PATHS = [];
 
 const FOOTER = '魔古工坊 · 非官方玩家工具，與遊戲營運商無關';
 
@@ -44,7 +44,7 @@ function readRoutes() {
 }
 
 test('there are pages to check', () => {
-  assert.deepEqual(pages.map((p) => p.path).sort(), ['/', '/doll/', '/mogugi/']);
+  assert.deepEqual(pages.map((p) => p.path).sort(), ['/', '/doll/', '/mabilat/', '/mogugi/']);
 });
 
 test('every page loads theme.js synchronously before site.css, and nav.js as module', () => {
@@ -171,6 +171,29 @@ test('home links the mogugi card to the release page and shows its version from 
   assert.ok(!home.includes('href="https://github.com/irusan-fanclub/mogugi/releases"'));
   assert.ok(home.includes('data-mogugi-ver hidden'));
   assert.ok(home.includes('<script type="module" src="/_shared/mogugi/home.js"></script>'));
+});
+
+test('mabilat page content is in the HTML', () => {
+  const html = pages.find((p) => p.path === '/mabilat/').html;
+  assert.match(html, /<title>mabilat 即時延遲・魔古工坊<\/title>/);
+  assert.ok(html.includes('<em-nav current="mabilat">'));
+  assert.ok(html.includes('<main class="wide">'));
+  for (const text of [
+    'mabilat 即時延遲',
+    '瑪奇台服各頻道的網路延遲，以不登入的 PING 連線量測，每 0.5 秒量測一次。資料來自單一家用網路(中華電信IP)，只代表這條線路，僅供參考',
+    '各指標仍在測試中，目前只能反映這條網路線路的狀況，無法用來判斷頻道或伺服器的好壞。',
+    '<h2>頻道</h2>', '每分鐘爆PING 次數', '每分鐘 p95', '爆PING 時間軸', '爆PING 紀錄', '表格檢視', '連線事件',
+    '<link rel="stylesheet" href="/_shared/mabilat/mabilat.css">',
+    '<script type="module" src="/_shared/mabilat/page.js"></script>',
+  ]) assert.ok(html.includes(text), `mabilat: ${text}`);
+  assert.ok(html.includes('<noscript>'), 'says it needs JS');
+});
+
+test('routeProblems rejects a wildcard under /mabilat/', () => {
+  const pg = ['/', '/doll/', '/mabilat/', '/mogugi/'];
+  const base = [`${HOST}/`, `${HOST}/doll`, `${HOST}/doll/`, `${HOST}/mabilat`, `${HOST}/mabilat/`, `${HOST}/mogugi`, `${HOST}/mogugi/`, `${HOST}/_shared/*`];
+  assert.deepEqual(routeProblems(base, pg), []);
+  assert.ok(routeProblems([...base, `${HOST}/mabilat/*`], pg).length > 0);
 });
 
 test('routeProblems rejects a wildcard under /mogugi/', () => {
