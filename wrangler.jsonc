@@ -11,6 +11,8 @@
     { "pattern": "mabinogi.elden-mogu.com/", "zone_name": "elden-mogu.com" },
     { "pattern": "mabinogi.elden-mogu.com/doll", "zone_name": "elden-mogu.com" },
     { "pattern": "mabinogi.elden-mogu.com/doll/", "zone_name": "elden-mogu.com" },
+    { "pattern": "mabinogi.elden-mogu.com/mogugi", "zone_name": "elden-mogu.com" },
+    { "pattern": "mabinogi.elden-mogu.com/mogugi/", "zone_name": "elden-mogu.com" },
     { "pattern": "mabinogi.elden-mogu.com/_shared/*", "zone_name": "elden-mogu.com" }
   ]
 }

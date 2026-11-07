@@ -19,12 +19,12 @@ test('navModel normalises flags to booleans', () => {
   assert.equal(home.dev, false);
 });
 
-test('phase-1 links: mogugi external to GitHub releases, mabilat to existing page', () => {
+test('links: mogugi to its release page, mabilat to existing page', () => {
   const by = Object.fromEntries(NAV_ITEMS.map((i) => [i.id, i]));
   assert.deepEqual(NAV_ITEMS.map((i) => i.id), ['home', 'mogugi', 'mabilat', 'doll']);
   assert.equal(by.home.href, '/');
-  assert.equal(by.mogugi.href, 'https://github.com/irusan-fanclub/mogugi/releases');
-  assert.equal(by.mogugi.external, true);
+  assert.equal(by.mogugi.href, '/mogugi/');
+  assert.ok(!by.mogugi.external);
   assert.equal(by.mabilat.href, '/mabilat/');
   assert.equal(by.doll.href, '/doll/');
   assert.equal(by.doll.dev, true);
@@ -49,7 +49,8 @@ test('every nav link has an accessible name even when labels are hidden', () => 
   const links = [...html.matchAll(/<a [^>]*>/g)].map((m) => m[0]);
   assert.equal(links.length, 5);
   for (const a of links) assert.match(a, /aria-label="[^"]+"/, a);
-  assert.match(html, /aria-label="mogugi（外部連結）"/);
+  assert.match(html, /aria-label="mogugi"/);
+  assert.ok(!html.includes('外部連結'));
 });
 
 test('brand logo is the 蘑菇雞 image', () => {

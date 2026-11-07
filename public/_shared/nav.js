@@ -4,7 +4,7 @@ export const THEME_LABEL = { auto: '主題：自動', light: '主題：淺色', 
 
 export const NAV_ITEMS = [
   { id: 'home', name: '主頁', href: '/' },
-  { id: 'mogugi', name: 'mogugi', href: 'https://github.com/irusan-fanclub/mogugi/releases', external: true },
+  { id: 'mogugi', name: 'mogugi', href: '/mogugi/' },
   { id: 'mabilat', name: 'mabilat', href: '/mabilat/' },
   { id: 'doll', name: '人偶計算機', href: '/doll/', dev: true },
 ];
