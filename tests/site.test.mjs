@@ -105,6 +105,9 @@ test('main content is in the HTML, not injected by JS', () => {
   assert.ok(home.includes('試算旋律人偶師的傷害、技能倍率、裝備效益。'), 'home: doll blurb');
   assert.ok(home.includes('src="/_shared/img/mogugi.png"'), 'home: mogugi icon');
   assert.ok(!home.includes('娜歐／貝婷／愛麗沙'), 'home: server eyebrow removed');
+  assert.ok(home.includes('<p class="lead">放一些奇怪東西的地方。</p>'), 'home: lead');
+  assert.ok(home.includes('<meta name="description" content="放一些奇怪東西的地方。">'), 'home: description');
+  assert.ok(home.includes('<meta property="og:description" content="放一些奇怪東西的地方。">'), 'home: og:description');
   const doll = pages.find((p) => p.path === '/doll/').html;
   for (const text of ['人偶傷害計算機', '到 Discord 追蹤進度']) {
     assert.ok(doll.includes(text), `doll: ${text}`);
