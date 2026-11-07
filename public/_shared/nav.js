@@ -41,11 +41,7 @@ const ICON = {
   dark: '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
 };
 
-const LOGO =
-  '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M2.5 16.5C2.5 8.5 8.6 3.5 16 3.5s13.5 5 13.5 13H2.5z" fill="var(--cap)" stroke="#2a0d0a" stroke-width="1.2"/>' +
-  '<circle cx="9" cy="10.5" r="2.2" fill="#fff4e6"/><circle cx="18.5" cy="7.5" r="1.7" fill="#fff4e6"/><circle cx="24" cy="12.5" r="1.5" fill="#fff4e6"/>' +
-  '<path d="M9 16.5h14v6.5a7 7 0 0 1-14 0z" fill="#fff4e6" stroke="#2a0d0a" stroke-width="1.2"/><circle cx="13.3" cy="21" r="1.3" fill="#1a1a1a"/>' +
-  '<circle cx="18.7" cy="21" r="1.3" fill="#1a1a1a"/><ellipse cx="11.6" cy="23.6" rx="1.3" ry=".8" fill="#ff9d9d"/><ellipse cx="20.4" cy="23.6" rx="1.3" ry=".8" fill="#ff9d9d"/></svg>';
+export const BRAND_LOGO = '<img src="/_shared/img/mogu-chicken-64.png" alt="" width="34" height="34">';
 
 function svg(name) {
   return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + ICON[name] + '</svg>';
@@ -93,7 +89,7 @@ class EmNav extends HTMLElement {
 
     this.innerHTML =
       '<nav class="rail" aria-label="工具">' +
-        '<div class="rail-head"><a class="brand" href="/">' + LOGO + '<b>魔古工坊</b></a>' +
+        '<div class="rail-head"><a class="brand" href="/">' + BRAND_LOGO + '<b>魔古工坊</b></a>' +
         '<button type="button" class="collapse" aria-label="收合導覽欄" title="收合導覽欄">' + svg('chev') + '</button></div>' +
         itemsHtml(model) + '<div class="grow"></div>' + themeButton() + discordItem() +
       '</nav>' +

@@ -66,6 +66,14 @@ test('every page has exactly one <em-nav current> naming a nav item', () => {
   }
 });
 
+test('every page uses the 蘑菇雞 icon for favicon, touch icon and link preview', () => {
+  for (const { path, html } of pages) {
+    assert.ok(html.includes('<link rel="icon" href="/_shared/img/mogu-chicken-32.png" type="image/png">'), `${path}: favicon`);
+    assert.ok(html.includes('<link rel="apple-touch-icon" href="/_shared/img/mogu-chicken-180.png">'), `${path}: touch icon`);
+    assert.ok(html.includes('<meta property="og:image" content="https://mabinogi.elden-mogu.com/_shared/img/mogu-chicken-256.png">'), `${path}: og:image`);
+  }
+});
+
 test('every page has a title with 魔古工坊, viewport-fit=cover and the footer text', () => {
   for (const { path, html } of pages) {
     assert.match(html, /<title>[^<]*魔古工坊[^<]*<\/title>/, `${path}: title`);

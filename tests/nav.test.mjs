@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { NAV_ITEMS, navModel, readCollapsed, DISCORD_URL, THEME_LABEL, COLLAPSE_KEY, itemsHtml, discordItem } from '../public/_shared/nav.js';
+import { NAV_ITEMS, navModel, readCollapsed, DISCORD_URL, THEME_LABEL, COLLAPSE_KEY, itemsHtml, discordItem, BRAND_LOGO } from '../public/_shared/nav.js';
 import { fakeStorage, throwingStorage } from './helpers.mjs';
 
 test('navModel marks only the current item', () => {
@@ -50,4 +50,8 @@ test('every nav link has an accessible name even when labels are hidden', () => 
   assert.equal(links.length, 5);
   for (const a of links) assert.match(a, /aria-label="[^"]+"/, a);
   assert.match(html, /aria-label="mogugi（外部連結）"/);
+});
+
+test('brand logo is the 蘑菇雞 image', () => {
+  assert.match(BRAND_LOGO, /<img src="\/_shared\/img\/mogu-chicken-64\.png" alt="" width="34" height="34">/);
 });

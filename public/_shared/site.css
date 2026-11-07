@@ -91,7 +91,7 @@ em-nav { display: contents; }
 .rail-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding-bottom: 14px; margin-bottom: 6px; border-bottom: 1px dashed var(--line); }
 .brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px; text-decoration: none; color: var(--ink); white-space: nowrap; }
 .brand b { font-family: var(--font-display); font-weight: 400; font-size: 20px; letter-spacing: .02em; }
-.brand svg { width: 30px; height: 30px; flex: none; }
+.brand img { width: 34px; height: 34px; flex: none; display: block; }
 .collapse {
   display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px;
   border: 1px solid var(--line); background: var(--bg-2); color: var(--muted); cursor: pointer;
