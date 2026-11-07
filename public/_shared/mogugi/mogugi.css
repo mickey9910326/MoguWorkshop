@@ -3,7 +3,7 @@
 .shot-hero { margin: 0; display: grid; gap: 6px; }
 .shot-hero figcaption { font-size: 12px; color: var(--muted); }
 .shot { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-2); position: relative; }
-.shot svg { display: block; width: 100%; height: auto; }
+.shot img { display: block; width: 100%; height: auto; }
 
 .dl { display: grid; gap: 14px; border-color: var(--accent); }
 .dl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -34,12 +34,11 @@
 
 .features { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .feat { display: grid; gap: 8px; align-content: start; }
-.feat .shot { border-radius: 8px; }
-.feat .shot::after {
-  content: "示意圖"; position: absolute; right: 6px; bottom: 4px; font-size: 10px; color: var(--muted);
-  background: var(--bg-2); padding: 0 5px; border-radius: 4px; opacity: .85;
-}
-.features .card h3 { font-size: 17px; font-family: var(--font-display); font-weight: 400; margin-bottom: 4px; color: var(--accent); }
+.feat .shot { border-radius: 8px; aspect-ratio: 16 / 10; }
+.feat .shot img { height: 100%; object-fit: cover; object-position: left top; }
+.features > .feat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.features > .feat:last-child:nth-child(odd) .shot { aspect-ratio: 21 / 8; }
+.features .card h3 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 17px; font-family: var(--font-display); font-weight: 400; margin-bottom: 4px; color: var(--accent); }
 .features .card p { margin: 0; color: var(--muted); font-size: 14px; }
 
 .notes { display: grid; gap: 10px; }

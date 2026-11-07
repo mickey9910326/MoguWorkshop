@@ -1,7 +1,4 @@
-import { fillShots } from './shots.js';
 import { loadReleases, downloadHtml, changelogHtml, unavailableHtml } from './releases.js';
-
-fillShots();
 
 const dl = document.getElementById('dl');
 const notes = document.getElementById('notes');

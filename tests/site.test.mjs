@@ -127,7 +127,8 @@ test('mogugi release page content is in the HTML', () => {
   assert.ok(html.includes('<meta property="og:title" content="mogugi・魔古工坊">'));
   for (const text of [
     `<p class="lead">${desc}</p>`,
-    '示意圖・戰鬥分頁',
+    '<img src="/_shared/mogugi/shots/battle.webp"',
+    '<figcaption>戰鬥分頁</figcaption>',
     '<h2>免費使用・需加入 Discord 啟用</h2>',
     'mogugi 完全免費，不收任何費用。第一次開啟時，需要用 Discord 帳號登入，並加入魔古工坊的 Discord 群組才能啟用。',
     '啟用的效期是 30 天。到期後 mogugi 會請你再用 Discord 登入一次，登入後就能繼續使用，紀錄和設定都會保留；如果那時已經不在群組裡，就無法再啟用。',
@@ -138,11 +139,19 @@ test('mogugi release page content is in the HTML', () => {
     '下載上面的 exe 並執行。',
     '之後每 30 天重新登入一次。',
     '開遊戲、進副本，打完就能在戰鬥分頁看結果。',
-    '<h3>傷害統計</h3>', '<h3>戰鬥紀錄</h3>', '<h3>角色與裝備</h3>', '<h3>物品索引</h3>',
+    '<h3>傷害統計</h3>', '<h3>戰鬥紀錄</h3>', '<h3>角色與裝備</h3>', '<h3>物品索引</h3>', '<img src="/_shared/mogugi/shots/gear.webp"', '<h3>遊戲內 Overlay <span class="pill dev">測試中</span></h3>',
+    '<img src="/_shared/mogugi/shots/report.webp"', '<img src="/_shared/mogugi/shots/log.webp"',
+    '<img src="/_shared/mogugi/shots/items.webp"', '<img src="/_shared/mogugi/shots/overlay.webp"',
     '<script type="module" src="/_shared/mogugi/page.js"></script>',
     '<link rel="stylesheet" href="/_shared/mogugi/mogugi.css">',
   ]) assert.ok(html.includes(text), `mogugi: ${text}`);
   assert.ok(!html.includes('Windows 桌面程式'));
+  assert.ok(!html.includes('data-shot'), 'no placeholder drawings left');
+  assert.ok(!html.includes('示意圖'), 'real screenshots are not labelled 示意圖');
+  for (const m of html.matchAll(/<img [^>]*>/g)) {
+    assert.match(m[0], / alt="[^"]+"/, m[0]);
+    assert.match(m[0], / width="\d+" height="\d+"/, m[0]);
+  }
   for (const id of ['dl', 'notes']) {
     const m = new RegExp(`id="${id}"[^>]*>([\\s\\S]*?)</div>`).exec(html);
     assert.ok(m && m[1].includes('暫時讀不到版本資料') && m[1].includes('https://github.com/irusan-fanclub/mogugi/releases'), `#${id} fallback`);
