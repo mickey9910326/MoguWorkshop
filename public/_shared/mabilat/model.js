@@ -58,3 +58,7 @@ export function clampMinutes(v) {
 }
 
 export const overviewUrl = (minutes) => `api/overview?minutes=${clampMinutes(minutes)}`;
+
+// A slow reply for a window the user has already left must not be drawn.
+// The loading reply carries no minutes and always counts.
+export const isCurrentReply = (data, minutes) => data.minutes == null || data.minutes === minutes;

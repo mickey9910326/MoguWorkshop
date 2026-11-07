@@ -74,3 +74,10 @@ test('window labels and the overview url', () => {
 test('escapeHtml covers attribute quotes', () => {
   assert.equal(escapeHtml(`<b a="1">'&`), '&lt;b a=&quot;1&quot;&gt;&#39;&amp;');
 });
+
+test('a reply only counts if it is for the window now selected', async () => {
+  const { isCurrentReply } = await import('../public/_shared/mabilat/model.js');
+  assert.equal(isCurrentReply({ minutes: 15, channels: [] }, 15), true);
+  assert.equal(isCurrentReply({ minutes: 1440, channels: [] }, 15), false);
+  assert.equal(isCurrentReply({ loading: true, channels: [] }, 15), true, 'loading reply has no minutes');
+});

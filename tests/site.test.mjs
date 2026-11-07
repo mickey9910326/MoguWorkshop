@@ -242,3 +242,8 @@ test('rail and main respect left/right safe-area insets (landscape notch)', () =
 test('the hidden attribute wins over component display rules', () => {
   assert.match(CSS, /\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}/);
 });
+
+test('README points the dev proxy at a mabilat started with the /mabilat base path', () => {
+  const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+  assert.match(readme, /--base-path \/mabilat/);
+});

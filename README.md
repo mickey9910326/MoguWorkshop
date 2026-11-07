@@ -10,7 +10,7 @@
 npm install
 npm test          # 主題、導覽與頁面結構檢查
 npm run dev       # 本機預覽 http://localhost:8787/
-npm run dev:proxy # 本機預覽 http://localhost:8788/，/mabilat/api/* 轉到正式站（唯讀）；MABILAT_API=http://localhost:8765 改接本機 mabilat
+npm run dev:proxy # 本機預覽 http://localhost:8788/，/mabilat/api/* 轉到正式站（唯讀）；MABILAT_API=http://localhost:8765 改接本機 mabilat（mabilat 要用 `python -m mabilat serve --port 8765 --base-path /mabilat` 啟動）
 ```
 
 `public/` 就是網站根目錄；共用外觀在 `public/_shared/`（`site.css`、`theme.js`、`nav.js`）。
@@ -38,7 +38,7 @@ npm run deploy
 部署後確認（其他服務的回應要跟部署前相同）：
 
 ```bash
-for p in / /doll/ /mogugi/ /mabilat/api/health /_shared/site.css /mabilat/ /mabilat/api/health /health /mogugi/auth/exchange /mogugi/ops/alert; do
+for p in / /doll/ /mogugi/ /_shared/site.css /mabilat/ /mabilat/api/health /health /mogugi/auth/exchange /mogugi/ops/alert; do
   printf '%s %s\n' "$p" "$(curl -s -o /dev/null -w '%{http_code} %{content_type}' https://mabinogi.elden-mogu.com$p)"
 done
 ```

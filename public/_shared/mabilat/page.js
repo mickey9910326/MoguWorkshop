@@ -1,6 +1,6 @@
 import {
   LEVELS, P95_LABELS, peakLevel, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
-  fmt, niceMax, ticks, winLabel, overviewUrl, escapeHtml,
+  fmt, niceMax, ticks, winLabel, overviewUrl, escapeHtml, isCurrentReply,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
@@ -260,6 +260,7 @@ async function poll() {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const data = await r.json();
     if (!data || !Array.isArray(data.channels)) throw new Error('資料格式不正確');
+    if (!isCurrentReply(data, state.minutes)) return;
     state.data = data;
     $('err').textContent = '';
     clearTimeout(retry);
