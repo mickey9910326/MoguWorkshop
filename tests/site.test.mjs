@@ -93,6 +93,10 @@ test('main content is in the HTML, not injected by JS', () => {
   for (const text of ['魔古工坊', 'mogugi', 'mabilat', '人偶傷害計算機', '加入伺服器', 'https://discord.gg/pJQsN4HgsD']) {
     assert.ok(home.includes(text), `home: ${text}`);
   }
+  assert.ok(home.includes('傷害計量器，並附有物品索引、狀態機制提醒、戰鬥記錄等功能。'), 'home: mogugi blurb');
+  assert.ok(home.includes('試算旋律人偶師的傷害、技能倍率、裝備效益。'), 'home: doll blurb');
+  assert.ok(home.includes('src="/_shared/img/mogugi.png"'), 'home: mogugi icon');
+  assert.ok(!home.includes('娜歐／貝婷／愛麗沙'), 'home: server eyebrow removed');
   const doll = pages.find((p) => p.path === '/doll/').html;
   for (const text of ['人偶傷害計算機', '到 Discord 追蹤進度']) {
     assert.ok(doll.includes(text), `doll: ${text}`);

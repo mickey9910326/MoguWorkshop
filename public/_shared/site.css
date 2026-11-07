@@ -1,40 +1,25 @@
-/* 魔古工坊 shared look: game-HUD panels, beveled frames, accent glow, gold highlights.
+/* 魔古工坊 shared look: flat panels with thin borders, faint grid background, green accent, gold highlights.
    Themes: ink (dark, default) and mist (light), chosen by theme.js via <html data-theme>. */
 
 :root, :root[data-theme="ink"] {
   --bg: #030805; --bg-2: #060e09; --surface: #09140d; --surface-2: #0e1c13;
   --ink: #dcefe3; --muted: #7d9a88; --line: #1a3022;
-  --accent-rgb: 31, 158, 92; --accent: #1f9e5c; --accent-hi: #45bf80; --accent-edge: #86dcae; --accent-deep: #0b3d20; --accent-ink: #021108;
+  --accent-rgb: 31, 158, 92; --accent: #1f9e5c; --accent-hi: #45bf80; --accent-ink: #021108;
   --gold-rgb: 212, 169, 74; --gold: #d4a94a;
-  --bevel: inset 0 1px 0 rgba(255, 255, 255, .06), inset 0 -2px 0 rgba(0, 0, 0, .35);
   --grid-line: rgba(255, 255, 255, .025);
-  --shadow-card: 0 6px 18px rgba(0, 0, 0, .25);
-  --shadow-btn: 0 4px 0 rgba(0, 0, 0, .6);
-  --shadow-btn-pressed: 0 1px 0 rgba(0, 0, 0, .6);
-  --shadow-rail: 4px 0 24px rgba(0, 0, 0, .35);
-  --title-shadow: 0 3px 0 rgba(0, 0, 0, .45), 0 0 24px rgba(var(--accent-rgb), .25);
-  --card-inner: rgba(255, 255, 255, .04);
   color-scheme: dark;
 }
 :root[data-theme="mist"] {
   --bg: #edf3ee; --bg-2: #e2ebe5; --surface: #ffffff; --surface-2: #f5f9f6;
   --ink: #13221a; --muted: #536e60; --line: #c3d5ca;
-  --accent-rgb: 26, 150, 100; --accent: #1a9664; --accent-hi: #34b37e; --accent-edge: #86d6b2; --accent-deep: #0d5838; --accent-ink: #ffffff;
+  --accent-rgb: 26, 150, 100; --accent: #1a9664; --accent-hi: #34b37e; --accent-ink: #ffffff;
   --gold-rgb: 196, 132, 14; --gold: #c4840e;
-  --bevel: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 -2px 0 rgba(20, 50, 35, .08);
   --grid-line: rgba(20, 50, 35, .04);
-  --shadow-card: 0 4px 14px rgba(20, 50, 35, .08);
-  --shadow-btn: 0 3px 0 rgba(20, 50, 35, .18);
-  --shadow-btn-pressed: 0 1px 0 rgba(20, 50, 35, .18);
-  --shadow-rail: 4px 0 18px rgba(20, 50, 35, .06);
-  --title-shadow: 0 2px 0 rgba(20, 50, 35, .08), 0 0 20px rgba(var(--accent-rgb), .18);
-  --card-inner: rgba(20, 50, 35, .05);
   color-scheme: light;
 }
 :root {
   --accent-soft: rgba(var(--accent-rgb), .12);
   --cap: #ff6f61;
-  --glow: 0 0 0 1px rgba(var(--accent-rgb), .35), 0 0 18px rgba(var(--accent-rgb), .22);
   --font-display: "Huninn", "jf open 粉圓", "Noto Sans TC", sans-serif;
   --font-num: "Chakra Petch", "Noto Sans TC", sans-serif;
   --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
@@ -46,11 +31,9 @@ body {
   color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.65;
   background-color: var(--bg);
   background-image:
-    radial-gradient(900px 500px at 85% -10%, rgba(var(--accent-rgb), .10), transparent 60%),
-    radial-gradient(700px 400px at -10% 110%, rgba(var(--gold-rgb), .06), transparent 60%),
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: auto, auto, 28px 28px, 28px 28px;
+  background-size: 28px 28px, 28px 28px;
   background-attachment: fixed;
 }
 a { color: var(--accent); }
@@ -60,28 +43,25 @@ svg.i { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor;
 
 .eyebrow { font-family: var(--font-num); font-size: 12px; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; }
 .lead { color: var(--muted); max-width: 62ch; margin: 8px 0 0; }
-.hero h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 7vw, 46px); text-shadow: var(--title-shadow); }
+.hero h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 7vw, 46px); }
 
 .card {
-  position: relative; background: linear-gradient(180deg, var(--surface-2), var(--surface));
-  border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--bevel), var(--shadow-card);
+  position: relative; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 12px; padding: 18px;
 }
-.card::before { content: ""; position: absolute; inset: 5px; border-radius: 10px; border: 1px solid var(--card-inner); pointer-events: none; }
 
 .section-title { font-family: var(--font-display); font-weight: 400; font-size: 22px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
-.section-title::before { content: ""; width: 10px; height: 10px; background: var(--accent); transform: rotate(45deg); border-radius: 2px; box-shadow: 0 0 10px var(--accent); flex: none; }
+.section-title::before { content: ""; width: 8px; height: 8px; background: var(--accent); transform: rotate(45deg); border-radius: 1px; flex: none; }
 
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 18px; border-radius: 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 18px; border-radius: 10px;
   font-weight: 700; text-decoration: none; font-size: 15px; color: var(--ink);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2), #fff 9%), var(--surface-2));
-  border: 1px solid color-mix(in srgb, var(--line), #fff 14%);
-  box-shadow: var(--shadow-btn), var(--bevel);
+  background: var(--surface-2); border: 1px solid var(--line);
 }
 .btn:hover { border-color: var(--accent); }
-.btn:active { transform: translateY(3px); box-shadow: var(--shadow-btn-pressed), var(--bevel); }
-.btn.primary { background: linear-gradient(180deg, var(--accent-hi), var(--accent)); border-color: var(--accent-edge); color: var(--accent-ink); box-shadow: 0 4px 0 var(--accent-deep), var(--glow); }
-.btn.primary:active { box-shadow: 0 1px 0 var(--accent-deep), var(--glow); }
+.btn:active { opacity: .85; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--accent-hi); border-color: var(--accent-hi); }
 
 .pill { display: inline-block; font-family: var(--font-num); font-size: 12px; line-height: 1.6; padding: 0 8px; border-radius: 6px; border: 1px solid currentColor; font-weight: 600; letter-spacing: .04em; }
 .pill.ok { color: var(--accent); background: var(--accent-soft); }
@@ -103,18 +83,18 @@ em-nav { display: contents; }
 
 .rail {
   position: sticky; top: 0; height: 100vh; height: 100dvh; z-index: 10;
-  background: linear-gradient(180deg, var(--surface-2), var(--surface));
-  border-right: 1px solid var(--line); box-shadow: var(--shadow-rail);
+  background: var(--surface);
+  border-right: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 4px; padding: 14px 10px; overflow: hidden;
   padding-left: calc(10px + env(safe-area-inset-left));
 }
 .rail-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding-bottom: 14px; margin-bottom: 6px; border-bottom: 1px dashed var(--line); }
 .brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px; text-decoration: none; color: var(--ink); white-space: nowrap; }
 .brand b { font-family: var(--font-display); font-weight: 400; font-size: 20px; letter-spacing: .02em; }
-.brand svg { width: 30px; height: 30px; flex: none; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .4)); }
+.brand svg { width: 30px; height: 30px; flex: none; }
 .collapse {
   display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px;
-  border: 1px solid var(--line); background: var(--bg-2); color: var(--muted); cursor: pointer; box-shadow: var(--bevel);
+  border: 1px solid var(--line); background: var(--bg-2); color: var(--muted); cursor: pointer;
 }
 .collapse:hover { color: var(--accent); border-color: var(--accent); }
 .collapse svg { transition: transform .2s; }
@@ -127,8 +107,7 @@ em-nav { display: contents; }
 .item:hover { background: var(--accent-soft); color: var(--ink); }
 .item[aria-current="page"] {
   color: var(--accent-ink); font-weight: 700;
-  background: linear-gradient(180deg, var(--accent-hi), var(--accent));
-  border-color: var(--accent-edge); box-shadow: var(--glow), var(--bevel);
+  background: var(--accent); border-color: var(--accent);
 }
 .item .ext { font-size: 12px; opacity: .7; }
 .item .soon { font-family: var(--font-num); font-size: 10px; letter-spacing: .08em; border: 1px solid var(--gold); color: var(--gold); border-radius: 4px; padding: 0 5px; font-weight: 600; }
@@ -144,7 +123,7 @@ button.item { font: inherit; background: none; cursor: pointer; text-align: left
 .mw-collapsed .rail { overflow: visible; }
 .mw-collapsed .rail .item:hover::after {
   content: attr(data-name); position: absolute; left: 50px; top: 50%; transform: translateY(-50%);
-  background: var(--surface-2); color: var(--ink); border: 1px solid var(--accent); box-shadow: var(--glow);
+  background: var(--surface-2); color: var(--ink); border: 1px solid var(--line);
   font-size: 13px; padding: 3px 10px; border-radius: 8px; white-space: nowrap; z-index: 20;
 }
 
@@ -156,18 +135,18 @@ button.item { font: inherit; background: none; cursor: pointer; text-align: left
     display: grid; place-items: center; position: fixed; z-index: 30;
     right: calc(16px + env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom));
     width: 58px; height: 58px; border-radius: 18px; cursor: pointer;
-    background: linear-gradient(180deg, var(--accent-hi), var(--accent)); color: var(--accent-ink);
-    border: 2px solid var(--accent-edge); box-shadow: var(--glow), 0 6px 0 var(--accent-deep), 0 10px 22px rgba(0, 0, 0, .5);
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
   }
-  .fab:active { transform: translateY(3px); box-shadow: var(--glow), 0 3px 0 var(--accent-deep), 0 6px 14px rgba(0, 0, 0, .5); }
+  .fab:active { opacity: .85; }
   .fab svg.i { width: 26px; height: 26px; }
   .scrim:not([hidden]) { display: block; position: fixed; inset: 0; background: rgba(2, 8, 6, .6); backdrop-filter: blur(2px); z-index: 25; }
   .sheet:not([hidden]) {
     display: flex; position: fixed; z-index: 28;
     right: calc(16px + env(safe-area-inset-right)); bottom: calc(92px + env(safe-area-inset-bottom));
-    width: min(280px, calc(100vw - 32px)); background: linear-gradient(180deg, var(--surface-2), var(--surface));
-    border: 1px solid var(--accent); border-radius: 16px; padding: 10px; flex-direction: column; gap: 4px;
-    box-shadow: var(--glow), 0 16px 40px rgba(0, 0, 0, .55);
+    width: min(280px, calc(100vw - 32px)); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 14px; padding: 10px; flex-direction: column; gap: 4px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .35);
   }
   .sheet .item { padding: 12px; font-size: 16px; }
   .sheet hr { border: 0; border-top: 1px dashed var(--line); margin: 4px 0; width: 100%; }
@@ -189,16 +168,18 @@ main {
 /* ---------- home ---------- */
 .tools { display: grid; gap: 14px; }
 .tool { display: grid; grid-template-columns: 52px 1fr auto; gap: 16px; align-items: center; text-decoration: none; color: var(--ink); }
-.tool:hover { border-color: var(--accent); box-shadow: var(--glow), var(--bevel); }
+.tool:hover { border-color: var(--accent); }
 .tool .ico {
-  width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; color: var(--accent);
-  background: radial-gradient(circle at 50% 35%, rgba(var(--accent-rgb), .25), rgba(var(--accent-rgb), .05)); border: 1px solid rgba(var(--accent-rgb), .4);
+  width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; color: var(--accent);
+  background: var(--accent-soft);
 }
+.tool .ico-img { background: none; overflow: hidden; }
+.tool .ico-img img { width: 52px; height: 52px; display: block; }
 .tool .ico svg.i { width: 26px; height: 26px; }
 .tool h2 { font-size: 18px; font-family: var(--font-display); font-weight: 400; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .tool p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
 .tool .go { color: var(--accent); font-family: var(--font-num); font-size: 22px; }
-.tool.dev .ico { color: var(--gold); border-color: rgba(var(--gold-rgb), .4); background: radial-gradient(circle at 50% 35%, rgba(var(--gold-rgb), .2), rgba(var(--gold-rgb), .04)); }
+.tool.dev .ico { color: var(--gold); background: rgba(var(--gold-rgb), .12); }
 .community { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .community .section-title { margin: 0; }
 .community p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
