@@ -92,3 +92,91 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding-top: 
 @media (prefers-reduced-motion: no-preference) {
   .btn { transition: background-color .15s, border-color .15s, box-shadow .15s, transform .08s; }
 }
+
+/* ---------- navigation: <em-nav> ----------
+   em-nav uses display: contents so its rail becomes the first column of the body grid.
+   The grid only applies once nav.js has run (html.mw-nav-ready), so pages read fine without JS. */
+:root { --rail: 208px; }
+:root.mw-collapsed { --rail: 60px; }
+em-nav { display: contents; }
+.mw-nav-ready body { display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); }
+
+.rail {
+  position: sticky; top: 0; height: 100vh; height: 100dvh; z-index: 10;
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  border-right: 1px solid var(--line); box-shadow: var(--shadow-rail);
+  display: flex; flex-direction: column; gap: 4px; padding: 14px 10px; overflow: hidden;
+}
+.rail-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding-bottom: 14px; margin-bottom: 6px; border-bottom: 1px dashed var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px; text-decoration: none; color: var(--ink); white-space: nowrap; }
+.brand b { font-family: var(--font-display); font-weight: 400; font-size: 20px; letter-spacing: .02em; }
+.brand svg { width: 30px; height: 30px; flex: none; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .4)); }
+.collapse {
+  display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--bg-2); color: var(--muted); cursor: pointer; box-shadow: var(--bevel);
+}
+.collapse:hover { color: var(--accent); border-color: var(--accent); }
+.collapse svg { transition: transform .2s; }
+
+.item {
+  display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 10px;
+  text-decoration: none; color: var(--muted); font-weight: 500; white-space: nowrap; position: relative;
+  border: 1px solid transparent;
+}
+.item:hover { background: var(--accent-soft); color: var(--ink); }
+.item[aria-current="page"] {
+  color: var(--accent-ink); font-weight: 700;
+  background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+  border-color: var(--accent-edge); box-shadow: var(--glow), var(--bevel);
+}
+.item .ext { font-size: 12px; opacity: .7; }
+.item .soon { font-family: var(--font-num); font-size: 10px; letter-spacing: .08em; border: 1px solid var(--gold); color: var(--gold); border-radius: 4px; padding: 0 5px; font-weight: 600; }
+.item.dev { opacity: .8; }
+button.item { font: inherit; background: none; cursor: pointer; text-align: left; width: 100%; }
+.rail .grow { flex: 1; }
+
+.mw-collapsed .rail-head .brand { display: none; }
+.mw-collapsed .rail-head { justify-content: center; }
+.mw-collapsed .rail .label, .mw-collapsed .rail .soon { display: none; }
+.mw-collapsed .collapse svg { transform: rotate(180deg); }
+.mw-collapsed .rail .item { justify-content: center; padding: 9px 0; }
+.mw-collapsed .rail { overflow: visible; }
+.mw-collapsed .rail .item:hover::after {
+  content: attr(data-name); position: absolute; left: 50px; top: 50%; transform: translateY(-50%);
+  background: var(--surface-2); color: var(--ink); border: 1px solid var(--accent); box-shadow: var(--glow);
+  font-size: 13px; padding: 3px 10px; border-radius: 8px; white-space: nowrap; z-index: 20;
+}
+
+.fab, .sheet, .scrim { display: none; }
+@media (max-width: 639px) {
+  .mw-nav-ready body { grid-template-columns: minmax(0, 1fr); }
+  .rail { display: none; }
+  .fab {
+    display: grid; place-items: center; position: fixed; z-index: 30;
+    right: calc(16px + env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom));
+    width: 58px; height: 58px; border-radius: 18px; cursor: pointer;
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent)); color: var(--accent-ink);
+    border: 2px solid var(--accent-edge); box-shadow: var(--glow), 0 6px 0 var(--accent-deep), 0 10px 22px rgba(0, 0, 0, .5);
+  }
+  .fab:active { transform: translateY(3px); box-shadow: var(--glow), 0 3px 0 var(--accent-deep), 0 6px 14px rgba(0, 0, 0, .5); }
+  .fab svg.i { width: 26px; height: 26px; }
+  .scrim:not([hidden]) { display: block; position: fixed; inset: 0; background: rgba(2, 8, 6, .6); backdrop-filter: blur(2px); z-index: 25; }
+  .sheet:not([hidden]) {
+    display: flex; position: fixed; z-index: 28;
+    right: calc(16px + env(safe-area-inset-right)); bottom: calc(92px + env(safe-area-inset-bottom));
+    width: min(280px, calc(100vw - 32px)); background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--accent); border-radius: 16px; padding: 10px; flex-direction: column; gap: 4px;
+    box-shadow: var(--glow), 0 16px 40px rgba(0, 0, 0, .55);
+  }
+  .sheet .item { padding: 12px; font-size: 16px; }
+  .sheet hr { border: 0; border-top: 1px dashed var(--line); margin: 4px 0; width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .item { transition: background-color .15s, border-color .15s, box-shadow .15s; }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 639px) {
+  .sheet:not([hidden]) { animation: mw-pop .18s cubic-bezier(.3, 1.5, .6, 1); transform-origin: bottom right; }
+  @keyframes mw-pop { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+}
+
+main { width: 100%; max-width: 840px; margin: 0 auto; padding: 32px 20px 104px; display: grid; gap: 28px; align-content: start; }
