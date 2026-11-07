@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NAV_ITEMS } from '../public/_shared/nav.js';
+import { routeProblems } from './routes.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const PUBLIC = join(ROOT, 'public');
@@ -39,7 +40,7 @@ function resolvesLocally(href) {
 
 function readRoutes() {
   const text = readFileSync(join(ROOT, 'wrangler.jsonc'), 'utf8').replace(/^\s*\/\/.*$/gm, '');
-  return (JSON.parse(text).routes || []).map((r) => (typeof r === 'string' ? r : r.pattern));
+  return JSON.parse(text).routes || [];
 }
 
 test('there are pages to check', () => {
@@ -98,14 +99,39 @@ test('main content is in the HTML, not injected by JS', () => {
   }
 });
 
-test('wrangler routes cover every page path and nothing broader than allowed', () => {
+test('routeProblems accepts exactly the expected route set', () => {
+  const ok = [`${HOST}/`, `${HOST}/doll`, `${HOST}/doll/`, `${HOST}/_shared/*`].map((pattern) => ({ pattern, zone_name: 'elden-mogu.com' }));
+  assert.deepEqual(routeProblems(ok, ['/', '/doll/']), []);
+});
+
+test('routeProblems rejects custom domains, extra paths and missing ones', () => {
+  const base = [`${HOST}/`, `${HOST}/doll`, `${HOST}/doll/`, `${HOST}/_shared/*`];
+  assert.ok(routeProblems([...base, { pattern: HOST, custom_domain: true }], ['/', '/doll/']).length > 0);
+  assert.ok(routeProblems([...base, `${HOST}/health`], ['/', '/doll/']).length > 0);
+  assert.ok(routeProblems([...base, `${HOST}/*`], ['/', '/doll/']).length > 0);
+  assert.ok(routeProblems(base.filter((r) => r !== `${HOST}/doll`), ['/', '/doll/']).length > 0);
+  assert.ok(routeProblems(base.filter((r) => r !== `${HOST}/_shared/*`), ['/', '/doll/']).length > 0);
+});
+
+test('wrangler routes are exactly the pages plus /_shared/* (or none yet)', () => {
   const routes = readRoutes();
-  assert.ok(!routes.includes(`${HOST}/*`), 'must not take over the whole host');
-  for (const r of routes.filter((r) => r.includes('*'))) {
-    assert.equal(r, `${HOST}/_shared/*`, `wildcard route not allowed: ${r}`);
-  }
   if (routes.length === 0) return;
-  for (const { path } of pages) {
-    assert.ok(routes.includes(HOST + path), `missing route for ${path}`);
-  }
+  assert.deepEqual(routeProblems(routes, pages.map((p) => p.path)), []);
+});
+
+const CSS = readFileSync(join(PUBLIC, '_shared', 'site.css'), 'utf8');
+function rule(selector) {
+  const start = CSS.search(new RegExp('(^|\\n)' + selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\{'));
+  if (start < 0) return '';
+  return CSS.slice(CSS.indexOf('{', start) + 1, CSS.indexOf('}', start));
+}
+
+test('main bottom padding includes the iPhone home-indicator inset', () => {
+  assert.match(rule('main'), /padding-bottom:\s*calc\(104px \+ env\(safe-area-inset-bottom\)\)/);
+});
+
+test('rail and main respect left/right safe-area insets (landscape notch)', () => {
+  assert.match(rule('.rail'), /padding-left:\s*calc\(10px \+ env\(safe-area-inset-left\)\)/);
+  assert.match(rule('main'), /safe-area-inset-left/);
+  assert.match(rule('main'), /safe-area-inset-right/);
 });

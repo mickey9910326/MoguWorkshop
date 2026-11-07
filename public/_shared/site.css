@@ -106,6 +106,7 @@ em-nav { display: contents; }
   background: linear-gradient(180deg, var(--surface-2), var(--surface));
   border-right: 1px solid var(--line); box-shadow: var(--shadow-rail);
   display: flex; flex-direction: column; gap: 4px; padding: 14px 10px; overflow: hidden;
+  padding-left: calc(10px + env(safe-area-inset-left));
 }
 .rail-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding-bottom: 14px; margin-bottom: 6px; border-bottom: 1px dashed var(--line); }
 .brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px; text-decoration: none; color: var(--ink); white-space: nowrap; }
@@ -179,7 +180,11 @@ button.item { font: inherit; background: none; cursor: pointer; text-align: left
   @keyframes mw-pop { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
 }
 
-main { width: 100%; max-width: 840px; margin: 0 auto; padding: 32px 20px 104px; display: grid; gap: 28px; align-content: start; }
+main {
+  width: 100%; max-width: 840px; margin: 0 auto; display: grid; gap: 28px; align-content: start;
+  padding: 32px calc(20px + env(safe-area-inset-right)) 0 calc(20px + env(safe-area-inset-left));
+  padding-bottom: calc(104px + env(safe-area-inset-bottom));
+}
 
 /* ---------- home ---------- */
 .tools { display: grid; gap: 14px; }

@@ -51,18 +51,19 @@ function svg(name) {
   return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + ICON[name] + '</svg>';
 }
 
-function itemsHtml(model) {
+export function itemsHtml(model) {
   return model
     .map((i) => {
       const attrs = [
         'class="item' + (i.dev ? ' dev' : '') + '"',
         'href="' + i.href + '"',
         'data-name="' + i.name + '"',
+        'aria-label="' + i.name + (i.external ? '（外部連結）' : '') + (i.dev ? '（開發中）' : '') + '"',
         i.current ? 'aria-current="page"' : '',
         i.external ? 'rel="noopener"' : '',
       ].filter(Boolean).join(' ');
       return '<a ' + attrs + '>' + svg(i.id) +
-        '<span class="label">' + i.name + (i.external ? ' <span class="ext" aria-label="（外部連結）">↗</span>' : '') + '</span>' +
+        '<span class="label">' + i.name + (i.external ? ' <span class="ext" aria-hidden="true">↗</span>' : '') + '</span>' +
         (i.dev ? '<span class="soon">開發中</span>' : '') + '</a>';
     })
     .join('');
@@ -72,8 +73,8 @@ function themeButton() {
   return globalThis.MoguTheme ? '<button type="button" class="item theme-btn"></button>' : '';
 }
 
-function discordItem() {
-  return '<a class="item" href="' + DISCORD_URL + '" rel="noopener" data-name="Discord">' + svg('discord') + '<span class="label">Discord</span></a>';
+export function discordItem() {
+  return '<a class="item" href="' + DISCORD_URL + '" rel="noopener" data-name="Discord" aria-label="Discord">' + svg('discord') + '<span class="label">Discord</span></a>';
 }
 
 function safeStorage() {

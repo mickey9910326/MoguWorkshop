@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { NAV_ITEMS, navModel, readCollapsed, DISCORD_URL, THEME_LABEL, COLLAPSE_KEY } from '../public/_shared/nav.js';
+import { NAV_ITEMS, navModel, readCollapsed, DISCORD_URL, THEME_LABEL, COLLAPSE_KEY, itemsHtml, discordItem } from '../public/_shared/nav.js';
 import { fakeStorage, throwingStorage } from './helpers.mjs';
 
 test('navModel marks only the current item', () => {
@@ -42,4 +42,12 @@ test('readCollapsed', () => {
 test('constants', () => {
   assert.equal(DISCORD_URL, 'https://discord.gg/pJQsN4HgsD');
   assert.deepEqual(THEME_LABEL, { auto: '主題：自動', light: '主題：淺色', dark: '主題：深色' });
+});
+
+test('every nav link has an accessible name even when labels are hidden', () => {
+  const html = itemsHtml(navModel('home')) + discordItem();
+  const links = [...html.matchAll(/<a [^>]*>/g)].map((m) => m[0]);
+  assert.equal(links.length, 5);
+  for (const a of links) assert.match(a, /aria-label="[^"]+"/, a);
+  assert.match(html, /aria-label="mogugi（外部連結）"/);
 });
