@@ -109,6 +109,9 @@ test('main content is in the HTML, not injected by JS', () => {
   for (const text of ['人偶傷害計算機', '到 Discord 追蹤進度']) {
     assert.ok(doll.includes(text), `doll: ${text}`);
   }
+  assert.ok(doll.includes('<p>試算旋律人偶師的傷害、技能倍率、裝備效益。完成後會在 Discord 公告。</p>'), 'doll: blurb matches home');
+  assert.ok(doll.includes('<meta name="description" content="試算旋律人偶師的傷害、技能倍率、裝備效益。開發中。">'), 'doll: description');
+  assert.ok(doll.includes('<meta property="og:description" content="試算旋律人偶師的傷害、技能倍率、裝備效益。開發中。">'), 'doll: og:description');
 });
 
 test('routeProblems accepts exactly the expected route set', () => {
