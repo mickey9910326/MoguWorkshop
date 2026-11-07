@@ -180,3 +180,30 @@ button.item { font: inherit; background: none; cursor: pointer; text-align: left
 }
 
 main { width: 100%; max-width: 840px; margin: 0 auto; padding: 32px 20px 104px; display: grid; gap: 28px; align-content: start; }
+
+/* ---------- home ---------- */
+.tools { display: grid; gap: 14px; }
+.tool { display: grid; grid-template-columns: 52px 1fr auto; gap: 16px; align-items: center; text-decoration: none; color: var(--ink); }
+.tool:hover { border-color: var(--accent); box-shadow: var(--glow), var(--bevel); }
+.tool .ico {
+  width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; color: var(--accent);
+  background: radial-gradient(circle at 50% 35%, rgba(var(--accent-rgb), .25), rgba(var(--accent-rgb), .05)); border: 1px solid rgba(var(--accent-rgb), .4);
+}
+.tool .ico svg.i { width: 26px; height: 26px; }
+.tool h2 { font-size: 18px; font-family: var(--font-display); font-weight: 400; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tool p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.tool .go { color: var(--accent); font-family: var(--font-num); font-size: 22px; }
+.tool.dev .ico { color: var(--gold); border-color: rgba(var(--gold-rgb), .4); background: radial-gradient(circle at 50% 35%, rgba(var(--gold-rgb), .2), rgba(var(--gold-rgb), .04)); }
+.community { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.community .section-title { margin: 0; }
+.community p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+/* ---------- placeholder page ---------- */
+.placeholder { text-align: center; padding: 40px 18px; display: grid; gap: 12px; justify-items: center; }
+.placeholder h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 6vw, 34px); }
+.placeholder p { margin: 0; color: var(--muted); max-width: 44ch; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tool { transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .tool:hover { transform: translateY(-2px); }
+}
