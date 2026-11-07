@@ -151,6 +151,8 @@ test('mogugi release page content is in the HTML', () => {
   assert.ok(order.every((v, i) => v > 0 && (i === 0 || v > order[i - 1])), `section order ${order}`);
   const shots = [...html.matchAll(/<a class="zoom" href="([^"]+)"[^>]*>\s*<img src="([^"]+)"/g)];
   assert.equal(shots.length, 5, 'every feature screenshot opens full size');
+  assert.ok(html.includes('<div class="features" id="features">'), 'showcase hook');
+  assert.equal([...html.matchAll(/<div class="card feat" id="feat-[a-z]+">/g)].length, 5, 'each feature has an id');
   for (const [, href, src] of shots) assert.equal(href, src);
   assert.ok(!html.includes('示意圖'), 'real screenshots are not labelled 示意圖');
   for (const m of html.matchAll(/<img [^>]*>/g)) {

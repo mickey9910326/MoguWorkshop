@@ -1,3 +1,4 @@
+import { mountShowcase } from './showcase.js';
 import { loadReleases, downloadHtml, changelogHtml, unavailableHtml } from './releases.js';
 
 // Screenshots open full size in a dialog; without JS (or <dialog>) the link
@@ -15,6 +16,11 @@ if (view && typeof view.showModal === 'function') {
     view.showModal();
   });
   view.addEventListener('click', () => view.close());
+}
+
+const features = document.getElementById('features');
+if (features) {
+  mountShowcase(features, { reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches });
 }
 
 const dl = document.getElementById('dl');
