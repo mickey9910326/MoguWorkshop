@@ -6,5 +6,11 @@
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "none"
   },
-  "workers_dev": true
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "mabinogi.elden-mogu.com/", "zone_name": "elden-mogu.com" },
+    { "pattern": "mabinogi.elden-mogu.com/doll", "zone_name": "elden-mogu.com" },
+    { "pattern": "mabinogi.elden-mogu.com/doll/", "zone_name": "elden-mogu.com" },
+    { "pattern": "mabinogi.elden-mogu.com/_shared/*", "zone_name": "elden-mogu.com" }
+  ]
 }
