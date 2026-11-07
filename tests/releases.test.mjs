@@ -76,10 +76,11 @@ test('renderNotes shows markup and links as plain text', () => {
 
 test('downloadHtml with mirror links', () => {
   const html = downloadHtml(rel('v0.6.1'));
-  for (const s of ['v0.6.1', '2026-11-06', '下載 exe', '下載 zip', '載不動時改用',
+  for (const s of ['v0.6.1', '2026-11-06', '下載 exe', '下載 zip', '下載走台灣有節點的鏡像。無法下載時，請改用 ',
     `${CDN}/v0.6.1/mogugi_0.6.1.exe`, `${CDN}/v0.6.1/mogugi_0.6.1.zip`]) {
     assert.ok(html.includes(s), s);
   }
+  assert.ok(!html.includes('載不動'));
 });
 
 test('downloadHtml without mirror links only offers GitHub', () => {

@@ -127,8 +127,6 @@ test('mogugi release page content is in the HTML', () => {
   assert.ok(html.includes('<meta property="og:title" content="mogugi・魔古工坊">'));
   for (const text of [
     `<p class="lead">${desc}</p>`,
-    '<img src="/_shared/mogugi/shots/battle.webp"',
-    '<figcaption>戰鬥分頁</figcaption>',
     '<h2>免費使用・需加入 Discord 啟用</h2>',
     'mogugi 完全免費，不收任何費用。第一次開啟時，需要用 Discord 帳號登入，並加入魔古工坊的 Discord 群組才能啟用。',
     '啟用的效期是 30 天。到期後 mogugi 會請你再用 Discord 登入一次，登入後就能繼續使用，紀錄和設定都會保留；如果那時已經不在群組裡，就無法再啟用。',
@@ -140,13 +138,20 @@ test('mogugi release page content is in the HTML', () => {
     '之後每 30 天重新登入一次。',
     '開遊戲、進副本，打完就能在戰鬥分頁看結果。',
     '<h3>傷害統計</h3>', '<h3>戰鬥紀錄</h3>', '<h3>角色與裝備</h3>', '<h3>物品索引</h3>', '<img src="/_shared/mogugi/shots/gear.webp"', '<h3>遊戲內 Overlay <span class="pill dev">測試中</span></h3>',
-    '<img src="/_shared/mogugi/shots/report.webp"', '<img src="/_shared/mogugi/shots/log.webp"',
+    '<img src="/_shared/mogugi/shots/battle.webp"', '<img src="/_shared/mogugi/shots/log.webp"',
     '<img src="/_shared/mogugi/shots/items.webp"', '<img src="/_shared/mogugi/shots/overlay.webp"',
     '<script type="module" src="/_shared/mogugi/page.js"></script>',
     '<link rel="stylesheet" href="/_shared/mogugi/mogugi.css">',
   ]) assert.ok(html.includes(text), `mogugi: ${text}`);
   assert.ok(!html.includes('Windows 桌面程式'));
   assert.ok(!html.includes('data-shot'), 'no placeholder drawings left');
+  assert.ok(!html.includes('shot-hero') && !html.includes('<figure'), 'no hero screenshot');
+  assert.ok(!html.includes('能做什麼'));
+  const order = ['id="dl"', '<h2 class="section-title">目前功能</h2>', '免費使用・需加入 Discord 啟用', '開始使用', '更新紀錄'].map((t) => html.indexOf(t));
+  assert.ok(order.every((v, i) => v > 0 && (i === 0 || v > order[i - 1])), `section order ${order}`);
+  const shots = [...html.matchAll(/<a class="zoom" href="([^"]+)"[^>]*>\s*<img src="([^"]+)"/g)];
+  assert.equal(shots.length, 5, 'every feature screenshot opens full size');
+  for (const [, href, src] of shots) assert.equal(href, src);
   assert.ok(!html.includes('示意圖'), 'real screenshots are not labelled 示意圖');
   for (const m of html.matchAll(/<img [^>]*>/g)) {
     assert.match(m[0], / alt="[^"]+"/, m[0]);

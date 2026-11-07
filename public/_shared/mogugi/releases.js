@@ -90,7 +90,7 @@ export function downloadHtml(r) {
     return `${head}<div class="dl-btns">${link(r.url, '到 GitHub 下載', 'btn primary')}</div>`;
   }
   return `${head}<div class="dl-btns">${btns.join('')}</div>`
-    + `<p class="dl-meta">下載走台灣有節點的鏡像。載不動時改用 ${link(r.url, 'GitHub release')}，內容相同。</p>`;
+    + `<p class="dl-meta">下載走台灣有節點的鏡像。無法下載時，請改用 ${link(r.url, 'GitHub release')}，內容相同。</p>`;
 }
 
 export function changelogHtml(list, max = 8) {
