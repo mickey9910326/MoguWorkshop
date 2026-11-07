@@ -1,0 +1,94 @@
+/* 魔古工坊 shared look: game-HUD panels, beveled frames, accent glow, gold highlights.
+   Themes: ink (dark, default) and mist (light), chosen by theme.js via <html data-theme>. */
+
+:root, :root[data-theme="ink"] {
+  --bg: #030805; --bg-2: #060e09; --surface: #09140d; --surface-2: #0e1c13;
+  --ink: #dcefe3; --muted: #7d9a88; --line: #1a3022;
+  --accent-rgb: 31, 158, 92; --accent: #1f9e5c; --accent-hi: #45bf80; --accent-edge: #86dcae; --accent-deep: #0b3d20; --accent-ink: #021108;
+  --gold-rgb: 212, 169, 74; --gold: #d4a94a;
+  --bevel: inset 0 1px 0 rgba(255, 255, 255, .06), inset 0 -2px 0 rgba(0, 0, 0, .35);
+  --grid-line: rgba(255, 255, 255, .025);
+  --shadow-card: 0 6px 18px rgba(0, 0, 0, .25);
+  --shadow-btn: 0 4px 0 rgba(0, 0, 0, .6);
+  --shadow-btn-pressed: 0 1px 0 rgba(0, 0, 0, .6);
+  --shadow-rail: 4px 0 24px rgba(0, 0, 0, .35);
+  --title-shadow: 0 3px 0 rgba(0, 0, 0, .45), 0 0 24px rgba(var(--accent-rgb), .25);
+  --card-inner: rgba(255, 255, 255, .04);
+  color-scheme: dark;
+}
+:root[data-theme="mist"] {
+  --bg: #edf3ee; --bg-2: #e2ebe5; --surface: #ffffff; --surface-2: #f5f9f6;
+  --ink: #13221a; --muted: #536e60; --line: #c3d5ca;
+  --accent-rgb: 26, 150, 100; --accent: #1a9664; --accent-hi: #34b37e; --accent-edge: #86d6b2; --accent-deep: #0d5838; --accent-ink: #ffffff;
+  --gold-rgb: 196, 132, 14; --gold: #c4840e;
+  --bevel: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 -2px 0 rgba(20, 50, 35, .08);
+  --grid-line: rgba(20, 50, 35, .04);
+  --shadow-card: 0 4px 14px rgba(20, 50, 35, .08);
+  --shadow-btn: 0 3px 0 rgba(20, 50, 35, .18);
+  --shadow-btn-pressed: 0 1px 0 rgba(20, 50, 35, .18);
+  --shadow-rail: 4px 0 18px rgba(20, 50, 35, .06);
+  --title-shadow: 0 2px 0 rgba(20, 50, 35, .08), 0 0 20px rgba(var(--accent-rgb), .18);
+  --card-inner: rgba(20, 50, 35, .05);
+  color-scheme: light;
+}
+:root {
+  --accent-soft: rgba(var(--accent-rgb), .12);
+  --cap: #ff6f61;
+  --glow: 0 0 0 1px rgba(var(--accent-rgb), .35), 0 0 18px rgba(var(--accent-rgb), .22);
+  --font-display: "Huninn", "jf open 粉圓", "Noto Sans TC", sans-serif;
+  --font-num: "Chakra Petch", "Noto Sans TC", sans-serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 500px at 85% -10%, rgba(var(--accent-rgb), .10), transparent 60%),
+    radial-gradient(700px 400px at -10% 110%, rgba(var(--gold-rgb), .06), transparent 60%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: auto, auto, 28px 28px, 28px 28px;
+  background-attachment: fixed;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+svg.i { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.eyebrow { font-family: var(--font-num); font-size: 12px; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; }
+.lead { color: var(--muted); max-width: 62ch; margin: 8px 0 0; }
+.hero h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 7vw, 46px); text-shadow: var(--title-shadow); }
+
+.card {
+  position: relative; background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--bevel), var(--shadow-card);
+}
+.card::before { content: ""; position: absolute; inset: 5px; border-radius: 10px; border: 1px solid var(--card-inner); pointer-events: none; }
+
+.section-title { font-family: var(--font-display); font-weight: 400; font-size: 22px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.section-title::before { content: ""; width: 10px; height: 10px; background: var(--accent); transform: rotate(45deg); border-radius: 2px; box-shadow: 0 0 10px var(--accent); flex: none; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 18px; border-radius: 12px;
+  font-weight: 700; text-decoration: none; font-size: 15px; color: var(--ink);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2), #fff 9%), var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--line), #fff 14%);
+  box-shadow: var(--shadow-btn), var(--bevel);
+}
+.btn:hover { border-color: var(--accent); }
+.btn:active { transform: translateY(3px); box-shadow: var(--shadow-btn-pressed), var(--bevel); }
+.btn.primary { background: linear-gradient(180deg, var(--accent-hi), var(--accent)); border-color: var(--accent-edge); color: var(--accent-ink); box-shadow: 0 4px 0 var(--accent-deep), var(--glow); }
+.btn.primary:active { box-shadow: 0 1px 0 var(--accent-deep), var(--glow); }
+
+.pill { display: inline-block; font-family: var(--font-num); font-size: 12px; line-height: 1.6; padding: 0 8px; border-radius: 6px; border: 1px solid currentColor; font-weight: 600; letter-spacing: .04em; }
+.pill.ok { color: var(--accent); background: var(--accent-soft); }
+.pill.dev { color: var(--gold); background: rgba(var(--gold-rgb), .1); }
+
+footer { color: var(--muted); font-size: 13px; text-align: center; padding-top: 8px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn { transition: background-color .15s, border-color .15s, box-shadow .15s, transform .08s; }
+}
