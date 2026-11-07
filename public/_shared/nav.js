@@ -1,4 +1,4 @@
-export const DISCORD_URL = 'https://discord.gg/pJQsN4HgsD';
+export const DISCORD_URL = 'https://discord.gg/SUvwdmwfmm';
 export const COLLAPSE_KEY = 'mw-nav-collapsed';
 export const THEME_LABEL = { auto: '主題：自動', light: '主題：淺色', dark: '主題：深色' };
 
