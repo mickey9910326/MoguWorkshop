@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   LEVELS, MIN_SAMPLES, P95_BREAKS, P95_LABELS, peakLevel, permilleLevel, cellPermille,
   pkSteps, pkLabels, pkIndex, p95Index, fmt, niceMax, ticks, winLabel, clampMinutes, overviewUrl, escapeHtml,
+  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES,
 } from '../public/_shared/mabilat/model.js';
 
 test('constants match mabilat', () => {
@@ -80,4 +81,28 @@ test('a reply only counts if it is for the window now selected', async () => {
   assert.equal(isCurrentReply({ minutes: 15, channels: [] }, 15), true);
   assert.equal(isCurrentReply({ minutes: 1440, channels: [] }, 15), false);
   assert.equal(isCurrentReply({ loading: true, channels: [] }, 15), true, 'loading reply has no minutes');
+});
+
+test('scoreView maps levels and missing values', () => {
+  assert.deepEqual(scoreView({ value: 94.96, level: 'normal', label: '普通' }), { cls: 'normal', label: '普通', text: '95' });
+  assert.deepEqual(scoreView({ value: 60, level: 'bad', label: '糟糕' }), { cls: 'critical', label: '糟糕', text: '60' });
+  assert.deepEqual(scoreView({ value: 72, level: 'laggy', label: '微卡' }), { cls: 'serious', label: '微卡', text: '72' });
+  assert.deepEqual(scoreView({ value: null, level: 'na', label: '樣本不足' }), { cls: 'na', label: '樣本不足', text: '–' });
+  assert.deepEqual(scoreView(null), { cls: 'na', label: '載入中', text: '–' });
+  assert.deepEqual(scoreView(undefined), { cls: 'na', label: '載入中', text: '–' });
+  assert.deepEqual(SCORE_CLS, { good: 'good', normal: 'normal', laggy: 'serious', bad: 'critical', na: 'na' });
+});
+
+test('scoreLegend comes from the rule', () => {
+  const rule = { levels: [{ key: 'good', label: '好', min: 95 }, { key: 'normal', label: '普通', min: 85 },
+    { key: 'laggy', label: '微卡', min: 70 }, { key: 'bad', label: '糟糕', min: 0 }] };
+  assert.deepEqual(scoreLegend(rule).map((l) => [l.cls, l.label, l.range]),
+    [['good', '好', '≥ 95'], ['normal', '普通', '85–95'], ['serious', '微卡', '70–85'], ['critical', '糟糕', '< 70']]);
+  assert.deepEqual(scoreLegend(null), []);
+});
+
+test('permille legend shows ranges only', () => {
+  assert.deepEqual(LEVEL_RANGES.map((l) => [l.cls, l.range]),
+    [['good', '< 1‰'], ['warning', '1–3‰'], ['serious', '3–5‰'], ['critical', '≥ 5‰']]);
+  for (const l of LEVEL_RANGES) assert.equal(l.label, undefined);
 });

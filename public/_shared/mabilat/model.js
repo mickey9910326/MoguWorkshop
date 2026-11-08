@@ -11,7 +11,25 @@ export const LEVELS = [
   { max: 5, cls: 'serious', label: '頻繁', range: '3–5‰' },
   { max: Infinity, cls: 'critical', label: '嚴重', range: '≥ 5‰' },
 ];
+// The permille legend shows ranges only; grades on this page come from the score.
+export const LEVEL_RANGES = LEVELS.map(({ cls, range }) => ({ cls, range }));
 export const MIN_SAMPLES = 600;
+
+// Hourly score: mabilat sends the value, level and rule; the page only maps
+// levels to the shared status colours.
+export const SCORE_CLS = { good: 'good', normal: 'normal', laggy: 'serious', bad: 'critical', na: 'na' };
+export function scoreView(s) {
+  if (!s) return { cls: 'na', label: '載入中', text: '–' };
+  return { cls: SCORE_CLS[s.level] || 'na', label: s.label, text: s.value == null ? '–' : String(Math.round(s.value)) };
+}
+export function scoreLegend(rule) {
+  const lv = rule?.levels || [];
+  return lv.map((l, i) => ({
+    cls: SCORE_CLS[l.key] || 'na',
+    label: l.label,
+    range: i === 0 ? `≥ ${l.min}` : i === lv.length - 1 ? `< ${lv[i - 1].min}` : `${l.min}–${lv[i - 1].min}`,
+  }));
+}
 
 export const peakLevel = (c) => (c.peak_permille == null || c.n < MIN_SAMPLES)
   ? { cls: 'na', label: '樣本不足' }
