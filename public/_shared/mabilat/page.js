@@ -129,23 +129,27 @@ function renderExplain() {
 const scoreTag = c => { const v = scoreView(c.score); return `<span class="lvl ${v.cls}"><i></i>${v.text} ${esc(v.label)}</span>`; };
 
 function renderTiles(chs) {
+  const rule = state.data && state.data.score_rule;
   $('tiles').innerHTML = chs.map(c => {
-    const l = scoreView(c.score);
+    const l = scoreView(c.score), pp = scoreParts(c.score, rule);
     return `
     <div class="tile lvl-${l.cls}">
       <div class="top"><span class="name">${esc(c.server)} ${esc(c.channel)}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>
-      <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lvl ${l.cls}"><i></i>${esc(l.label)}</span></div>
-      <div class="meta">p50 <b>${fmt(c.p50)}</b> ms · p95 <b>${fmt(c.p95)}</b> ms</div>
-      <div class="peaks" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING率 <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks} 次）</div>
-      ${(pp => pp ? `<div class="parts" title="近 60 分鐘各部分扣的分數"><span>扣分 HighPing <b>−${pp.hp.toFixed(1)}</b></span> · <span>SlowPing <b>−${pp.sp.toFixed(1)}</b></span></div>` : '')(scoreParts(c.score, state.data && state.data.score_rule))}
+      <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span></div>
+      <div class="ln">p50 <b>${fmt(c.p50)}</b> · p95 <b>${fmt(c.p95)}</b> ms</div>
+      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數"><span>HP扣分 <b>−${pp.hp.toFixed(1)}</b></span> · <span>SP扣分 <b>−${pp.sp.toFixed(1)}</b></span></div>` : ''}
+      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING率 <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks} 次）</div>
     </div>`;
   }).join('') || `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;
 }
 
 function renderTable(chs) {
+  const rule = state.data && state.data.score_rule;
+  const part = (c, k) => { const pp = scoreParts(c.score, rule); return pp ? `−${pp[k].toFixed(1)}` : '–'; };
   $('table-count').textContent = chs.length ? `${chs.length} 個頻道` : '';
-  $('table').innerHTML = '<thead><tr><th>伺服器</th><th>頻道</th><th>狀態</th><th>分數</th><th class="num">平常延遲（p50）</th><th class="num">p95</th><th class="num">爆PING 次數</th></tr></thead><tbody>' +
+  $('table').innerHTML = '<thead><tr><th>伺服器</th><th>頻道</th><th>狀態</th><th>分數</th><th class="num">HP扣分</th><th class="num">SP扣分</th><th class="num">p50</th><th class="num">p95</th><th class="num">爆PING 次數</th></tr></thead><tbody>' +
     chs.map(c => `<tr><td>${esc(c.server)}</td><td>${esc(c.channel)}</td><td>${STATUS_TEXT[c.status]}</td><td>${scoreTag(c)}</td>` +
+      `<td class="num">${part(c, 'hp')}</td><td class="num">${part(c, 'sp')}</td>` +
       `<td class="num">${fmt(c.p50)}</td><td class="num">${fmt(c.p95)}</td><td class="num">${c.peaks}</td></tr>`).join('') + '</tbody>';
 }
 

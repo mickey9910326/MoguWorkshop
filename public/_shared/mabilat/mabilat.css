@@ -83,17 +83,7 @@ main.wide table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .lvl.critical i, .pm.critical i { background: var(--critical); border-radius: 1px; }
 
 /* 頻道卡片：依爆PING 等級上底色與左側色條（右上角的數字與圓點仍在，不只靠顏色） */
-.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-.tile { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--surface-1); text-align: left; font: inherit; color: inherit; }
 /* 頻道卡不上等級底色：爆PING 主要取決於網路路徑，不代表頻道好壞；等級只留右上角的數字與圓點 */
-.tile .top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
-.tile .name { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tile .pm { font-size: 13px; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.tile .pm i { margin-right: 4px; vertical-align: 0; }
-.tile .big { font-size: 24px; font-weight: 650; margin: 2px 0 0; }
-.tile .big small { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
-.tile .meta, .tile .peaks { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tile .peaks b { color: var(--text-primary); }
 .status { font-size: 12px; font-weight: 400; color: var(--text-secondary); white-space: nowrap; }
 .status i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: 0; }
 .status.timeout i { background: var(--warning); }
@@ -125,16 +115,24 @@ details.note ul { margin: 6px 0 0; padding-left: 18px; }
 .count { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 .err { color: var(--critical); font-size: 13px; }
 
-/* channel card: the hourly score is the headline */
-.tile .score { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 6px 0 4px; }
-.tile .score .v { font-size: 34px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.tile .meta b { color: var(--text-primary); font-weight: 600; }
-.tile .meta, .tile .peaks { text-align: center; }
 
 /* sampling and score explanation */
 #about h3 { font-size: 14px; margin: 14px 0 6px; }
 .about { margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.7; color: var(--text-secondary); }
 
-.tile .parts { font-size: 12px; color: var(--text-secondary); text-align: center; font-variant-numeric: tabular-nums; }
-.tile .parts b { color: var(--text-primary); font-weight: 600; }
-.tile .parts span { white-space: nowrap; }
+
+/* channel card: compact, tinted by score level */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 8px; }
+.tile { --lv: var(--border); border: 1px solid var(--border); border-left: 4px solid var(--lv); border-radius: 8px; padding: 7px 10px 8px;
+        background: color-mix(in srgb, var(--lv) var(--lvl-tint), var(--surface-1)); }
+.tile.lvl-good { --lv: var(--good); } .tile.lvl-normal { --lv: var(--normal); }
+.tile.lvl-serious { --lv: var(--serious); } .tile.lvl-critical { --lv: var(--critical); }
+.tile .top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.tile .name { font-weight: 650; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .score { display: flex; align-items: baseline; gap: 6px; margin: 1px 0 2px; }
+.tile .score .v { font-size: 26px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.tile .score .lv { font-size: 12px; font-weight: 650; color: var(--lv); }
+.tile.lvl-na .score .lv { color: var(--text-muted); }
+.tile .ln { font-size: 11.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; line-height: 1.55; }
+.tile .ln b { color: var(--text-primary); font-weight: 600; }
+.tile .ln span { white-space: nowrap; }
