@@ -180,13 +180,17 @@ test('mabilat page content is in the HTML', () => {
   assert.ok(html.includes('<main class="wide">'));
   for (const text of [
     'mabilat 即時延遲',
-    '瑪奇台服各頻道的網路延遲，以不登入的 PING 連線量測，每 0.5 秒量測一次。資料來自單一家用網路(中華電信IP)，只代表這條線路，僅供參考',
+    '瑪奇台服各頻道的網路品質估算。量測主機ISP為新華電信，物理位置在新竹。數據可能因電信業者以及地理位置有偏差，僅供參考。',
     '<h2>頻道</h2>', '每分鐘爆PING 次數', '每分鐘 p95', '表格檢視',
     '<link rel="stylesheet" href="/_shared/mabilat/mabilat.css">',
     '<script type="module" src="/_shared/mabilat/page.js"></script>',
   ]) assert.ok(html.includes(text), `mabilat: ${text}`);
   assert.doesNotMatch(html, /id="score-summary"|近 60 分鐘分數/);
   assert.doesNotMatch(html, /各指標仍在測試中|class="notice"|大字是近 60 分鐘的分數/);
+  assert.doesNotMatch(html, /<span class="badge">測試中<\/span>/);
+  for (const h of ['每分鐘爆PING 次數', '每分鐘 p95', '取樣與分數說明']) {
+    assert.match(html, new RegExp(String.raw`<details class="fold">\s*<summary><h2[^>]*>${h}`), `${h} starts folded`);
+  }
   assert.ok(html.includes('取樣與分數說明'));
   assert.match(html, /id="score-explain"/);
   assert.ok(html.includes('每 0.5 秒'));

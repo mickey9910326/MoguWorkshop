@@ -157,7 +157,7 @@ function render() {
   renderFilters();
   const chs = visible();
   if (loading()) $('sub').textContent = '伺服器剛重啟，載入資料中，約需一分鐘…';
-  else if (state.data) $('sub').textContent = `${winLabel(state.minutes)} · 更新於 ${hhmmss(state.data.now)}`;
+  else if (state.data) $('sub').textContent = `更新於 ${hhmmss(state.data.now)}`;
   renderLvlLegend(); renderExplain();
   renderTiles(chs); renderHeat(chs); renderHeat95(chs); renderTable(chs);
 }

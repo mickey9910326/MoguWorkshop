@@ -25,10 +25,10 @@
 <em-nav current="mabilat"></em-nav>
 <main class="wide">
   <header class="ml-head">
-    <h1>mabilat 即時延遲 <span class="badge">測試中</span></h1>
+    <h1>mabilat 即時延遲</h1>
     <span class="sub" id="sub">載入中…</span>
   </header>
-  <p class="intro">瑪奇台服各頻道的網路延遲，以不登入的 PING 連線量測，每 0.5 秒量測一次。資料來自單一家用網路(中華電信IP)，只代表這條線路，僅供參考</p>
+  <p class="intro">瑪奇台服各頻道的網路品質估算。量測主機ISP為新華電信，物理位置在新竹。數據可能因電信業者以及地理位置有偏差，僅供參考。</p>
   <div class="filters">
     <div class="seg" id="f-server" role="group" aria-label="伺服器"></div>
     <div class="seg" id="f-window" role="group" aria-label="時間範圍"></div>
@@ -44,7 +44,7 @@
   </section>
 
   <section class="card">
-    <details class="fold" open>
+    <details class="fold">
       <summary><h2 id="heat-title">每分鐘爆PING 次數</h2></summary>
       <p class="desc">一列一個頻道、一格<span id="heat-unit">一分鐘</span>。一小時以內顏色越深爆PING 越多；近一天每格改用爆PING 機率，由綠到紅分級。</p>
       <div class="heat-wrap"><div class="heat" id="heat"></div></div>
@@ -53,7 +53,7 @@
   </section>
 
   <section class="card">
-    <details class="fold" open>
+    <details class="fold">
       <summary><h2 id="p95-title">每分鐘 p95</h2></summary>
       <p class="desc">一格是該時段的 p95（95% 的 PING 低於這個值），顏色越深越慢；用來看平常延遲的穩定度，爆PING 請看上一張。</p>
       <div class="heat-wrap"><div class="heat" id="heat95"></div></div>
@@ -69,10 +69,11 @@
   </section>
 
   <section class="card" id="about">
-    <h2>取樣與分數說明</h2>
+    <details class="fold">
+    <summary><h2>取樣與分數說明</h2></summary>
     <h3>取樣方式</h3>
     <ul class="about">
-      <li>量測端：一台在台灣、使用中華電信網路的電腦，不登入遊戲；結果只代表這條線路。</li>
+      <li>量測端：新竹的一台電腦（ISP 見頁首說明），不登入遊戲；結果只代表這條線路。</li>
       <li>對象：娜歐、貝婷、愛麗沙三台伺服器，每台 CH1–CH13 與 HOUSE，共 42 個頻道，每個頻道各保持一條連線。</li>
       <li>PING：每 0.5 秒送一個小封包，伺服器原樣回傳，量來回時間。</li>
       <li>每條連線用滿 5 分鐘就重新連線，換一條網路路徑；每條連線的第一筆不計（剛連上時偏高）。沒有回應的算逾時，不計入延遲。</li>
@@ -81,6 +82,7 @@
     </ul>
     <h3>分數計算</h3>
     <ul class="about" id="score-explain"><li>載入中…</li></ul>
+    </details>
   </section>
 
   <noscript><p class="err">這個頁面需要 JavaScript 才能顯示即時資料。</p></noscript>
