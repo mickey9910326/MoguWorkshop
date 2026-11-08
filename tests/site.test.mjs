@@ -180,7 +180,7 @@ test('mabilat page content is in the HTML', () => {
   assert.ok(html.includes('<main class="wide">'));
   for (const text of [
     'mabilat 即時延遲',
-    '瑪奇台服各頻道的網路品質估算。量測主機ISP為新華電信，物理位置在新竹。數據可能因電信業者以及地理位置有偏差，僅供參考。',
+    '瑪奇台服各頻道的網路品質估算。量測主機ISP為中華電信，物理位置在新竹。數據可能因電信業者以及地理位置有偏差，僅供參考。',
     '<h2>頻道</h2>', '每分鐘爆PING 次數', '每分鐘 p95', '表格檢視',
     '<link rel="stylesheet" href="/_shared/mabilat/mabilat.css">',
     '<script type="module" src="/_shared/mabilat/page.js"></script>',
