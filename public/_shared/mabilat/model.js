@@ -30,6 +30,13 @@ export function scoreLegend(rule) {
   }));
 }
 
+// Points each part took off the score, scaled to a full window like the API does.
+export function scoreParts(s, rule) {
+  if (!s || !rule || !s.n || s.value == null) return null;
+  const f = (rule.window_min * 120) / s.n;
+  return { hp: +((s.d / rule.k) * f).toFixed(1), sp: +((s.s / rule.k2) * f).toFixed(1) };
+}
+
 // Plain-text lines explaining the score, built from the API's rule so the
 // numbers on the page always match what mabilat computes.
 export function scoreExplain(rule) {

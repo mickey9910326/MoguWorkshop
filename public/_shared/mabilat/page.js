@@ -1,6 +1,6 @@
 import {
   LEVEL_RANGES, P95_LABELS, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
-  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain,
+  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
@@ -137,6 +137,7 @@ function renderTiles(chs) {
       <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lvl ${l.cls}"><i></i>${esc(l.label)}</span></div>
       <div class="meta">p50 <b>${fmt(c.p50)}</b> ms · p95 <b>${fmt(c.p95)}</b> ms</div>
       <div class="peaks" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING率 <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks} 次）</div>
+      ${(pp => pp ? `<div class="parts" title="近 60 分鐘各部分扣的分數"><span>扣分 HighPing <b>−${pp.hp.toFixed(1)}</b></span> · <span>SlowPing <b>−${pp.sp.toFixed(1)}</b></span></div>` : '')(scoreParts(c.score, state.data && state.data.score_rule))}
     </div>`;
   }).join('') || `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;
 }

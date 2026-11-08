@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   LEVELS, P95_BREAKS, P95_LABELS, permilleLevel, cellPermille,
   pkSteps, pkLabels, pkIndex, p95Index, fmt, winLabel, clampMinutes, overviewUrl, escapeHtml,
-  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain,
+  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain, scoreParts,
 } from '../public/_shared/mabilat/model.js';
 
 test('constants match mabilat', () => {
@@ -97,4 +97,17 @@ test('scoreExplain spells out the rule with its own numbers', () => {
   }
   assert.ok(!/卡頓量|慢 ping 量/.test(text));
   assert.deepEqual(scoreExplain(null), []);
+});
+
+test('scoreParts turns D and S into points deducted', () => {
+  const rule = { window_min: 60, k: 22, k2: 500 };
+  // D 440 ms, S 1000 ms over 7200 samples → HighPing 20 points, SlowPing 2 points
+  assert.deepEqual(scoreParts({ d: 440, s: 1000, n: 7200, value: 78 }, rule), { hp: 20, sp: 2 });
+  // fewer samples scale up to a full hour
+  assert.deepEqual(scoreParts({ d: 220, s: 0, n: 5400, value: 92 }, rule), { hp: 13.3, sp: 0 });
+  // no score (too few samples) → no breakdown either
+  assert.equal(scoreParts({ d: 220, s: 0, n: 3600, value: null }, rule), null);
+  assert.equal(scoreParts({ d: 0, s: 0, n: 0 }, rule), null);
+  assert.equal(scoreParts(null, rule), null);
+  assert.equal(scoreParts({ d: 1, s: 1, n: 10 }, null), null);
 });
