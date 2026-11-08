@@ -2,6 +2,7 @@
 // /mabilat/api/* to MABILAT_API (default: the live site, read-only).
 //   npm run dev:proxy                       -> http://localhost:8788/
 //   MABILAT_API=http://localhost:8765 npm run dev:proxy
+//     (start that mabilat with: python -m mabilat serve --port 8765 --base-path /mabilat)
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, posix } from 'node:path';

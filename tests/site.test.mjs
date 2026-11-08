@@ -243,7 +243,7 @@ test('the hidden attribute wins over component display rules', () => {
   assert.match(CSS, /\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}/);
 });
 
-test('README points the dev proxy at a mabilat started with the /mabilat base path', () => {
-  const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
-  assert.match(readme, /--base-path \/mabilat/);
+test('dev proxy notes say to start a local mabilat with the /mabilat base path', () => {
+  const src = readFileSync(join(ROOT, 'tools', 'dev-server.mjs'), 'utf8');
+  assert.match(src, /--base-path \/mabilat/);
 });
