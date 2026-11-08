@@ -1,6 +1,6 @@
 import {
   LEVEL_RANGES, P95_LABELS, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
-  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts, overviewRows, SCORE_LABEL,
+  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts, overviewRows, SCORE_LABEL, SCORE_CLS, scoreLevelOf,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
@@ -58,7 +58,7 @@ const timeLabel = (t, bucket) => `${hhmm(t)}${bucket > 60 ? `–${hhmm(t + bucke
 const p95Var = v => `var(--p95-${p95Index(v)})`;
 const levelFill = l => l.cls === 'good' ? 'var(--heat-good)' : `var(--${l.cls})`;
 
-// 通用熱度圖：一列一個頻道、一格一個時段；color(m) 回傳背景色或 null
+// 通用熱度圖：一列一個頻道、一格一個時段；color(m, c, i) 回傳背景色或 null
 function renderGrid(el, legendEl, chs, color, tipBody, legendHtml) {
   if (!chs.length) {
     el.innerHTML = `<div class="empty">${loading() ? '伺服器剛重啟，載入資料中，約需一分鐘…' : '這段時間沒有資料'}</div>`;
@@ -71,7 +71,7 @@ function renderGrid(el, legendEl, chs, color, tipBody, legendHtml) {
   for (const c of chs) {
     html += `<div class="lab">${esc(c.server)} ${esc(c.channel)}</div>`;
     c.minutes.forEach((m, i) => {
-      const bg = m.n > 0 ? color(m) : null;
+      const bg = m.n > 0 ? color(m, c, i) : null;
       const cls = !m.n && m.lost ? 'cell lost' : 'cell';
       html += `<div class="${cls}" style="${bg ? `background:${bg}` : ''}" data-ip="${esc(c.ip)}" data-i="${i}"></div>`;
     });
@@ -85,9 +85,9 @@ function renderGrid(el, legendEl, chs, color, tipBody, legendHtml) {
   const byIp = Object.fromEntries(chs.map(c => [c.ip, c]));
   el.querySelectorAll('.cell').forEach(x => {
     x.onmousemove = e => {
-      const c = byIp[x.dataset.ip], m = c.minutes[+x.dataset.i], t = start + (+x.dataset.i) * bucket;
+      const i = +x.dataset.i, c = byIp[x.dataset.ip], m = c.minutes[i], t = start + i * bucket;
       showTip(`<b>${esc(c.server)} ${esc(c.channel)}</b> <span class="t">${timeLabel(t, bucket)}</span><br>` +
-        (m.n ? tipBody(m) + '<br>' : '沒有成功的 PING<br>') +
+        (m.n ? tipBody(m, c, i) + '<br>' : '沒有成功的 PING<br>') +
         `<span class="t">PING ${m.n} 次${m.lost ? `，逾時 ${m.lost}` : ''}</span>`, e.clientX, e.clientY);
     };
     x.onmouseleave = hideTip;
@@ -106,6 +106,21 @@ function renderHeat(chs) {
   renderGrid($('heat'), $('legend'), chs,
     m => dayMode() ? levelFill(permilleLevel(cellPermille(m))) : pkVar(m.peaks, bucket),
     m => `爆PING <b>${m.peaks}</b> 次（${fmt(cellPermille(m), 2)}‰）· p50 ${fmt(m.p50)} ms`, legend);
+}
+
+// 每格是到該時段結束為止的近 60 分鐘分數，顏色用分數等級
+const scoreFill = cls => cls === 'na' ? 'var(--heat-na)' : cls === 'good' ? 'var(--heat-good)' : `var(--${cls})`;
+function renderHeatScore(chs) {
+  const rule = state.data && state.data.score_rule;
+  const at = (c, i) => (c.score_series || [])[i] ?? null;
+  renderGrid($('heat-score'), $('legend-score'), chs,
+    (m, c, i) => scoreFill(SCORE_CLS[scoreLevelOf(at(c, i), rule)]),
+    (m, c, i) => {
+      const v = at(c, i), key = scoreLevelOf(v, rule);
+      return v == null ? `分數 <b>–</b> ${SCORE_LABEL.na}` : `分數 <b>${v.toFixed(1)}</b> ${SCORE_LABEL[key]}`;
+    },
+    scoreLegend(rule).map(l => `<span><span class="sw" style="background:${scoreFill(l.cls)}"></span>${l.label} ${l.range}</span>`).join('') +
+      `<span><span class="sw" style="background:var(--heat-na)"></span>${SCORE_LABEL.na}</span>`);
 }
 
 function renderHeat95(chs) {
@@ -177,7 +192,7 @@ function render() {
   if (loading()) $('sub').textContent = '伺服器剛重啟，載入資料中，約需一分鐘…';
   else if (state.data) $('sub').textContent = `更新於 ${hhmmss(state.data.now)}`;
   renderLvlLegend(); renderExplain();
-  renderTiles(chs); renderHeat(chs); renderHeat95(chs); renderTable(chs);
+  renderTiles(chs); renderHeatScore(chs); renderHeat(chs); renderHeat95(chs); renderTable(chs);
 }
 
 // A failed poll keeps the last good data on screen and shows why; the next

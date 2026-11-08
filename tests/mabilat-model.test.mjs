@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   LEVELS, P95_BREAKS, P95_LABELS, permilleLevel, cellPermille,
   pkSteps, pkLabels, pkIndex, p95Index, fmt, winLabel, clampMinutes, overviewUrl, escapeHtml,
-  SCORE_CLS, SCORE_LABEL, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain, scoreParts, overviewRows,
+  SCORE_CLS, SCORE_LABEL, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain, scoreParts, overviewRows, scoreLevelOf,
 } from '../public/_shared/mabilat/model.js';
 
 test('constants match mabilat', () => {
@@ -130,4 +130,14 @@ test('level wording comes from the page, not the API', () => {
   const rule = { levels: [{ key: 'good', label: '好', min: 95 }, { key: 'normal', label: 'x', min: 85 },
     { key: 'laggy', label: 'y', min: 70 }, { key: 'bad', label: 'z', min: 0 }] };
   assert.deepEqual(scoreLegend(rule).map((l) => l.label), ['良好', '普通', '微卡', '糟糕']);
+});
+
+test('scoreLevelOf maps a value to the API rule levels', () => {
+  const rule = { levels: [{ key: 'good', min: 95 }, { key: 'normal', min: 85 }, { key: 'laggy', min: 70 }, { key: 'bad', min: 0 }] };
+  assert.equal(scoreLevelOf(95, rule), 'good');
+  assert.equal(scoreLevelOf(94.9, rule), 'normal');
+  assert.equal(scoreLevelOf(70, rule), 'laggy');
+  assert.equal(scoreLevelOf(0, rule), 'bad');
+  assert.equal(scoreLevelOf(null, rule), 'na');
+  assert.equal(scoreLevelOf(90, null), 'na');
 });

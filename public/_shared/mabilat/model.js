@@ -32,6 +32,12 @@ export function scoreLegend(rule) {
   }));
 }
 
+// Level key for a bare score value (heatmap cells), using the API's thresholds.
+export function scoreLevelOf(v, rule) {
+  if (v == null || !rule?.levels?.length) return 'na';
+  return (rule.levels.find((l) => v >= l.min) || rule.levels[rule.levels.length - 1]).key;
+}
+
 // Overview grid: one row per channel number (CH1–CH13, then HOUSE), one cell
 // per server in the given order; a server without that channel gives null.
 const chOrder = (ch) => (ch === 'HOUSE' ? 99 : Number(ch.replace(/\D/g, '')) || 98);

@@ -45,6 +45,15 @@
 
   <section class="card">
     <details class="fold">
+      <summary><h2>分數熱度圖</h2></summary>
+      <p class="desc">一列一個頻道，每格是該時段結束時往前 60 分鐘算出的分數，顏色同上方等級。</p>
+      <div class="heat-wrap"><div class="heat" id="heat-score"></div></div>
+      <div class="legend" id="legend-score"></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details class="fold">
       <summary><h2 id="heat-title">每分鐘爆PING 次數</h2></summary>
       <p class="desc">一列一個頻道、一格<span id="heat-unit">一分鐘</span>。一小時以內顏色越深爆PING 越多；近一天每格改用爆PING 機率，由綠到紅分級。</p>
       <div class="heat-wrap"><div class="heat" id="heat"></div></div>

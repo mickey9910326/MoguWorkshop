@@ -188,7 +188,8 @@ test('mabilat page content is in the HTML', () => {
   assert.doesNotMatch(html, /id="score-summary"|近 60 分鐘分數/);
   assert.doesNotMatch(html, /各指標仍在測試中|class="notice"|大字是近 60 分鐘的分數/);
   assert.doesNotMatch(html, /<span class="badge">測試中<\/span>/);
-  for (const h of ['每分鐘爆PING 次數', '每分鐘 p95', '取樣與分數說明']) {
+  assert.match(html, /id="heat-score"/);
+  for (const h of ['分數熱度圖', '每分鐘爆PING 次數', '每分鐘 p95', '取樣與分數說明']) {
     assert.match(html, new RegExp(String.raw`<details class="fold">\s*<summary><h2[^>]*>${h}`), `${h} starts folded`);
   }
   assert.ok(html.includes('取樣與分數說明'));
