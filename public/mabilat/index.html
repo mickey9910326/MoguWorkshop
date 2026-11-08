@@ -59,7 +59,7 @@
         <ul>
           <li>PING：每個頻道保持一條連線，每 0.5 秒送一個小封包，伺服器原樣回傳，量來回時間。</li>
           <li>爆PING：延遲 ≥ 100 ms。實測幾乎都是封包掉了、等重傳補回，會卡約 0.3 秒；遊戲走 TCP，一個封包掉了後面都得等，所以跟體感卡頓最相關。</li>
-          <li>爆PING 機率用千分比（‰），不受時間範圍與 PING 間隔影響，比較頻道看這個；少於 600 次 PING 時不分級。</li>
+          <li>分數：近 60 分鐘每次 PING 超過 6 ms 的部分（100 ms 以上以 100 ms 計）加上 4.3–6 ms 的慢 ping 一起扣分，換算成 0–100；不受上方時間範圍影響。少於 5,400 次 PING 時不給分。</li>
           <li>p50、p95 是整段時間範圍內所有 PING 合計的統計；近一天的數值由直方圖推估，誤差約 2%。</li>
           <li>「全域」爆PING：多個頻道在同一秒同時發生，多半是本機線路的問題，與頻道無關。</li>
         </ul>
@@ -71,7 +71,7 @@
   <section class="card">
     <details class="fold" open>
       <summary><h2 id="heat-title">每分鐘爆PING 次數</h2></summary>
-      <p class="desc">一列一個頻道、一格<span id="heat-unit">一分鐘</span>。一小時以內顏色越深爆PING 越多；近一天每格改用爆PING 機率，由綠到紅分級。點頻道名或格子看該頻道的時間軸。</p>
+      <p class="desc">一列一個頻道、一格<span id="heat-unit">一分鐘</span>。一小時以內顏色越深爆PING 越多；近一天每格改用爆PING 機率，由綠到紅分級。</p>
       <div class="heat-wrap"><div class="heat" id="heat"></div></div>
       <div class="legend" id="legend"></div>
     </details>
@@ -86,22 +86,6 @@
     </details>
   </section>
 
-  <section class="card" id="timeline">
-    <details class="fold" open>
-      <summary><h2 id="tl-title">爆PING 時間軸</h2></summary>
-      <p class="desc"><span class="c-series">━</span> 每個時段的 p50　<span class="c-critical">▮</span> 背景直條：該時段有爆PING（顏色同熱度圖；一小時以內 2 次以上標數字）</p>
-      <div class="stats" id="tl-stats"></div>
-      <div id="tl-chart"><div class="empty">點選一個頻道</div></div>
-    </details>
-  </section>
-
-  <section class="card">
-    <details class="fold">
-      <summary><h2>爆PING 紀錄 <span class="count" id="peaks-count"></span></h2></summary>
-      <div class="scroll-x"><table id="peaks"></table></div>
-    </details>
-  </section>
-
   <section class="card">
     <details class="fold">
       <summary><h2>表格檢視 <span class="count" id="table-count"></span></h2></summary>
@@ -109,12 +93,6 @@
     </details>
   </section>
 
-  <section class="card">
-    <details class="fold">
-      <summary><h2>連線事件 <span class="count" id="events-count"></span></h2></summary>
-      <ul class="events" id="events"></ul>
-    </details>
-  </section>
   <noscript><p class="err">這個頁面需要 JavaScript 才能顯示即時資料。</p></noscript>
 
   <footer>魔古工坊 · 非官方玩家工具，與遊戲營運商無關</footer>

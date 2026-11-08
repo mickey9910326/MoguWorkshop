@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  LEVELS, MIN_SAMPLES, P95_BREAKS, P95_LABELS, peakLevel, permilleLevel, cellPermille,
-  pkSteps, pkLabels, pkIndex, p95Index, fmt, niceMax, ticks, winLabel, clampMinutes, overviewUrl, escapeHtml,
+  LEVELS, P95_BREAKS, P95_LABELS, permilleLevel, cellPermille,
+  pkSteps, pkLabels, pkIndex, p95Index, fmt, winLabel, clampMinutes, overviewUrl, escapeHtml,
   SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES,
 } from '../public/_shared/mabilat/model.js';
 
@@ -10,23 +10,8 @@ test('constants match mabilat', () => {
   assert.deepEqual(LEVELS.map((l) => [l.max, l.cls, l.label, l.range]), [
     [1, 'good', '穩定', '< 1‰'], [3, 'warning', '偶爾', '1–3‰'], [5, 'serious', '頻繁', '3–5‰'], [Infinity, 'critical', '嚴重', '≥ 5‰'],
   ]);
-  assert.equal(MIN_SAMPLES, 600);
   assert.deepEqual(P95_BREAKS, [4, 6, 10, 20, 50, 100]);
   assert.deepEqual(P95_LABELS, ['< 4', '4–6', '6–10', '10–20', '20–50', '50–100', '≥ 100']);
-});
-
-test('peakLevel thresholds and insufficient samples', () => {
-  const at = (pm, n = 1000) => peakLevel({ peak_permille: pm, n }).cls;
-  assert.equal(at(0), 'good');
-  assert.equal(at(0.99), 'good');
-  assert.equal(at(1), 'warning');
-  assert.equal(at(2.99), 'warning');
-  assert.equal(at(3), 'serious');
-  assert.equal(at(5), 'critical');
-  assert.equal(at(50), 'critical');
-  assert.deepEqual(peakLevel({ peak_permille: 0, n: 599 }), { cls: 'na', label: '樣本不足' });
-  assert.equal(at(0, 600), 'good');
-  assert.equal(peakLevel({ peak_permille: null, n: 5000 }).cls, 'na');
 });
 
 test('cell permille and its level', () => {
@@ -53,13 +38,6 @@ test('fmt shows a dash for missing values', () => {
   assert.equal(fmt(undefined), '–');
   assert.equal(fmt(3.14159), '3.14');
   assert.equal(fmt(3.14159, 1), '3.1');
-});
-
-test('axis helpers', () => {
-  assert.equal(niceMax(4), 5);
-  assert.equal(niceMax(37), 50);
-  assert.equal(niceMax(6200), 7000);
-  assert.deepEqual(ticks(50), [0, 10, 20, 30, 40, 50]);
 });
 
 test('window labels and the overview url', () => {

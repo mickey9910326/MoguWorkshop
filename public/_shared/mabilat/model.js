@@ -13,7 +13,6 @@ export const LEVELS = [
 ];
 // The permille legend shows ranges only; grades on this page come from the score.
 export const LEVEL_RANGES = LEVELS.map(({ cls, range }) => ({ cls, range }));
-export const MIN_SAMPLES = 600;
 
 // Hourly score: mabilat sends the value, level and rule; the page only maps
 // levels to the shared status colours.
@@ -30,10 +29,6 @@ export function scoreLegend(rule) {
     range: i === 0 ? `≥ ${l.min}` : i === lv.length - 1 ? `< ${lv[i - 1].min}` : `${l.min}–${lv[i - 1].min}`,
   }));
 }
-
-export const peakLevel = (c) => (c.peak_permille == null || c.n < MIN_SAMPLES)
-  ? { cls: 'na', label: '樣本不足' }
-  : LEVELS.find((l) => c.peak_permille < l.max);
 
 export const cellPermille = (m) => (m.n ? 1000 * m.peaks / m.n : null);
 export const permilleLevel = (v) => LEVELS.find((l) => v < l.max);
@@ -57,15 +52,6 @@ export function p95Index(v) {
 }
 
 export const fmt = (v, d = 2) => (v == null ? '–' : v.toFixed(d));
-
-export function niceMax(v) {
-  for (const m of [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000]) if (v <= m) return m;
-  return Math.ceil(v / 1000) * 1000;
-}
-export function ticks(m) {
-  const s = m / 5;
-  return [0, 1, 2, 3, 4, 5].map((i) => +(i * s).toFixed(2));
-}
 
 export const winLabel = (v) => (v >= 1440 ? '近一天' : `近 ${v} 分鐘`);
 

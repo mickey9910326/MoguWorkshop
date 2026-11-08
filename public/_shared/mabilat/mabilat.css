@@ -68,9 +68,8 @@ main.wide table { width: 100%; border-collapse: collapse; font-size: 13px; }
 /* 熱度圖 */
 .heat-wrap { overflow-x: auto; }
 .heat { display: grid; gap: 2px; align-items: center; min-width: 560px; }
-.heat .lab { font-size: 12px; color: var(--text-secondary); white-space: nowrap; padding-right: 8px; cursor: pointer; }
-.heat .lab.sel { color: var(--text-primary); font-weight: 650; }
-.heat .cell { height: 14px; border-radius: 2px; background: transparent; cursor: pointer; }
+.heat .lab { font-size: 12px; color: var(--text-secondary); white-space: nowrap; padding-right: 8px; }
+.heat .cell { height: 14px; border-radius: 2px; background: transparent; }
 .heat .cell.lost { background: repeating-linear-gradient(45deg, var(--lost) 0 2px, transparent 2px 4px); }
 .heat .axis { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
@@ -85,9 +84,7 @@ main.wide table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
 /* 頻道卡片：依爆PING 等級上底色與左側色條（右上角的數字與圓點仍在，不只靠顏色） */
 .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-.tile { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; background: var(--surface-1); text-align: left; font: inherit; color: inherit; }
-.tile:hover { box-shadow: inset 0 0 0 999px var(--hover-wash); }
-.tile[aria-pressed="true"] { outline: 2px solid var(--select-ring); outline-offset: -1px; }
+.tile { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--surface-1); text-align: left; font: inherit; color: inherit; }
 /* 頻道卡不上等級底色：爆PING 主要取決於網路路徑，不代表頻道好壞；等級只留右上角的數字與圓點 */
 .tile .top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
 .tile .name { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -104,17 +101,10 @@ main.wide table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .status.down i { background: var(--critical); border-radius: 1px; }
 
 /* 爆PING 時間軸 */
-#timeline svg { display: block; width: 100%; height: 240px; }
-.stats { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
-.stats b { color: var(--text-primary); font-weight: 650; }
 
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
 th { color: var(--text-secondary); font-weight: 600; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-.tag { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); margin-left: 6px; }
-.events { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; }
-.events li { padding: 4px 0; border-bottom: 1px solid var(--grid); color: var(--text-secondary); }
-.events time { color: var(--text-muted); font-variant-numeric: tabular-nums; margin-right: 8px; }
 #tip { position: fixed; pointer-events: none; z-index: 10; display: none; background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.12); font-variant-numeric: tabular-nums; white-space: nowrap; }
 #tip .t { color: var(--text-secondary); }
 
