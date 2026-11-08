@@ -135,3 +135,9 @@ details.note[open] summary::before { transform: rotate(90deg); }
 details.note ul { margin: 6px 0 0; padding-left: 18px; }
 .count { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
 .err { color: var(--critical); font-size: 13px; }
+
+/* hourly score summary */
+.score-sum { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.sum-box { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--surface-1); }
+.sum-box .name { font-weight: 650; }
+.sum-box .v { font-size: 28px; font-weight: 650; font-variant-numeric: tabular-nums; margin: 2px 0 4px; }

@@ -1,6 +1,6 @@
 import {
-  LEVELS, P95_LABELS, peakLevel, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
-  fmt, niceMax, ticks, winLabel, overviewUrl, escapeHtml, isCurrentReply,
+  LEVEL_RANGES, P95_LABELS, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
+  fmt, niceMax, ticks, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
@@ -9,7 +9,6 @@ const POLL_MS = 5000;
 const SERVERS = ['全部', '娜歐', '貝婷', '愛麗沙'];
 const WINDOWS = [15, 30, 60, 1440];
 const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
-const lvlTag = c => { const l = peakLevel(c); return `<span class="lvl ${l.cls}"><i></i>${l.label}</span>`; };
 const pkVar = (n, bucket) => `var(--pk-${pkIndex(n, bucket)})`;
 // 近一天每格 5～10 分鐘，改用爆PING 機率（‰）依等級由綠到紅；一小時以內每格樣本太少，維持次數
 const dayMode = () => bucketOf() > 60;
@@ -104,7 +103,7 @@ function renderHeat(chs) {
   $('heat-title').textContent = dayMode() ? `每 ${unit}爆PING 機率` : '每分鐘爆PING 次數';
   $('heat-unit').textContent = bucket > 60 ? `${bucket / 60} 分鐘` : '一分鐘';
   const legend = dayMode()
-    ? LEVELS.map(l => `<span><span class="sw" style="background:${levelFill(l)}"></span>${l.label} ${l.range}</span>`).join('')
+    ? LEVEL_RANGES.map(l => `<span><span class="sw" style="background:${levelFill(l)}"></span>${l.range}</span>`).join('')
     : '<span><span class="sw" style="background:var(--pk-0)"></span>0 次</span>' +
       pkLabels(bucket).map((l, i) => `<span><span class="sw" style="background:var(--pk-${i + 1})"></span>${l} 次</span>`).join('');
   renderGrid($('heat'), $('legend'), chs,
@@ -137,17 +136,29 @@ function spark(c) {
 }
 
 function renderLvlLegend() {
-  $('lvl-legend').innerHTML = LEVELS.map(l => `<span class="lvl ${l.cls}"><i></i>${l.label} ${l.range}</span>`).join('') +
+  $('lvl-legend').innerHTML = scoreLegend(state.data && state.data.score_rule)
+    .map(l => `<span class="lvl ${l.cls}"><i></i>${l.label} ${l.range}</span>`).join('') +
     `<span class="lvl na"><i></i>樣本不足</span>`;
 }
 
+function renderSummary() {
+  const sum = state.data && state.data.score_summary;
+  $('score-summary').innerHTML = SERVERS.map(name => {
+    const v = scoreView(sum && (name === '全部' ? sum.all : sum.servers[name]));
+    return `<div class="sum-box lvl-${v.cls}"><div class="name">${esc(name)}</div>` +
+      `<div class="v">${v.text}</div><span class="lvl ${v.cls}"><i></i>${esc(v.label)}</span></div>`;
+  }).join('');
+}
+
+const scoreTag = c => { const v = scoreView(c.score); return `<span class="lvl ${v.cls}"><i></i>${v.text} ${esc(v.label)}</span>`; };
+
 function renderTiles(chs) {
   $('tiles').innerHTML = chs.map(c => {
-    const l = peakLevel(c);
+    const l = scoreView(c.score);
     return `
     <button type="button" class="tile lvl-${l.cls}" aria-pressed="${c.ip === state.selected}" data-ip="${esc(c.ip)}">
       <div class="top"><span class="name">${esc(c.server)} ${esc(c.channel)}${c.status === 'up' ? '' : ` <span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</span>
-        <span class="pm ${l.cls}" title="爆PING 機率：每 1000 次 PING 中延遲 ≥ 100 ms 的次數（${l.label}）"><i></i>${fmt(c.peak_permille, 2)}‰</span></div>
+        <span class="pm ${l.cls}" title="近 60 分鐘分數（${esc(l.label)}）"><i></i>${l.text} ${esc(l.label)}</span></div>
       <div class="big">${fmt(c.p50)} <small>ms</small></div>
       <div class="meta">p95 ${fmt(c.p95)} ms${c.loss_pct > 0 ? ` · 遺失 ${fmt(c.loss_pct, 1)}%` : ''}</div>
       <div class="peaks" title="爆PING 次數／成功的 PING 次數">爆PING <b>${c.peaks}</b>／${c.n.toLocaleString('en-US')} 次${c.peaks !== c.peaks_local ? `（全域 ${c.peaks - c.peaks_local}）` : ''}</div>
@@ -216,11 +227,9 @@ function renderTimeline() {
 
 function renderTable(chs) {
   $('table-count').textContent = chs.length ? `${chs.length} 個頻道` : '';
-  $('table').innerHTML = '<thead><tr><th>伺服器</th><th>頻道</th><th>IP</th><th>狀態</th><th class="num">p50</th><th class="num">p95</th><th class="num">max</th><th class="num">jitter</th><th class="num">PING 次數</th><th class="num">遺失%</th><th>爆PING 等級</th><th class="num">爆PING</th><th class="num">爆PING‰</th><th class="num">伺服器→你</th><th class="num">你→伺服器（疑）</th><th class="num">連線數</th></tr></thead><tbody>' +
-    chs.map(c => `<tr><td>${esc(c.server)}</td><td>${esc(c.channel)}</td><td>${esc(c.ip)}</td><td>${STATUS_TEXT[c.status]}</td>` +
-      `<td class="num">${fmt(c.p50)}</td><td class="num">${fmt(c.p95)}</td><td class="num">${fmt(c.max)}</td><td class="num">${fmt(c.jitter)}</td>` +
-      `<td class="num">${c.n}</td><td class="num">${fmt(c.loss_pct, 1)}</td><td>${lvlTag(c)}</td><td class="num">${c.peaks}</td><td class="num">${fmt(c.peak_permille, 2)}</td>` +
-      `<td class="num">${c.peak_kinds.down}</td><td class="num">${c.peak_kinds.up}</td><td class="num">${c.conns}</td></tr>`).join('') + '</tbody>';
+  $('table').innerHTML = '<thead><tr><th>伺服器</th><th>頻道</th><th>狀態</th><th>分數</th><th class="num">平常延遲（p50）</th><th class="num">p95</th><th class="num">爆PING 次數</th></tr></thead><tbody>' +
+    chs.map(c => `<tr><td>${esc(c.server)}</td><td>${esc(c.channel)}</td><td>${STATUS_TEXT[c.status]}</td><td>${scoreTag(c)}</td>` +
+      `<td class="num">${fmt(c.p50)}</td><td class="num">${fmt(c.p95)}</td><td class="num">${c.peaks}</td></tr>`).join('') + '</tbody>';
 }
 
 function renderPeaks() {
@@ -248,6 +257,7 @@ function render() {
   const npk = chs.reduce((a, c) => a + c.peaks, 0);
   if (loading()) $('sub').textContent = '伺服器剛重啟，載入資料中，約需一分鐘…';
   else if (state.data) $('sub').textContent = `${winLabel(state.minutes)} · ${up}/${chs.length} 個頻道連線中 · 爆PING ${npk} 次 · 更新於 ${hhmmss(state.data.now)}`;
+  renderSummary(); renderLvlLegend();
   renderTiles(chs); renderHeat(chs); renderHeat95(chs); renderTimeline(); renderPeaks(); renderTable(chs); renderEvents();
 }
 
@@ -272,6 +282,7 @@ async function poll() {
 }
 
 renderFilters();
+renderSummary();
 renderLvlLegend();
 poll();
 setInterval(poll, POLL_MS);
