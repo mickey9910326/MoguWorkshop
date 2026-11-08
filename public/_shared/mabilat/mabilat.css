@@ -136,3 +136,16 @@ details.note ul { margin: 6px 0 0; padding-left: 18px; }
 .tile .ln { font-size: 11.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; line-height: 1.55; }
 .tile .ln b { color: var(--text-primary); font-weight: 600; }
 .tile .ln span { white-space: nowrap; }
+
+/* overview: channel × server table, the score as a small tinted chip */
+table.ov { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.ov th, table.ov td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: left; white-space: nowrap; }
+table.ov th { color: var(--text-secondary); font-weight: 600; font-size: 13px; }
+table.ov td.ch { color: var(--text-secondary); font-weight: 600; width: 72px; }
+.chip { --lv: var(--text-muted); display: inline-flex; align-items: baseline; gap: 6px; padding: 1px 10px 1px 8px; border-radius: 999px;
+        background: color-mix(in srgb, var(--lv) calc(var(--lvl-tint) + 6%), transparent); border: 1px solid color-mix(in srgb, var(--lv) 45%, transparent); }
+.chip.lvl-good { --lv: var(--good); } .chip.lvl-normal { --lv: var(--normal); }
+.chip.lvl-serious { --lv: var(--serious); } .chip.lvl-critical { --lv: var(--critical); }
+.chip .v { font-weight: 700; font-size: 14.5px; min-width: 2.6em; }
+.chip .l { font-size: 12px; font-weight: 650; color: var(--lv); }
+.ov-none { color: var(--text-muted); }

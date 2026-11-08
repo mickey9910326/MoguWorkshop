@@ -30,6 +30,17 @@ export function scoreLegend(rule) {
   }));
 }
 
+// Overview grid: one row per channel number (CH1–CH13, then HOUSE), one cell
+// per server in the given order; a server without that channel gives null.
+const chOrder = (ch) => (ch === 'HOUSE' ? 99 : Number(ch.replace(/\D/g, '')) || 98);
+export function overviewRows(channels, servers) {
+  const names = [...new Set(channels.map((c) => c.channel))].sort((a, b) => chOrder(a) - chOrder(b));
+  return names.map((channel) => ({
+    channel,
+    cells: servers.map((s) => channels.find((c) => c.server === s && c.channel === channel) || null),
+  }));
+}
+
 // Points each part took off the score, scaled to a full window like the API does.
 export function scoreParts(s, rule) {
   if (!s || !rule || !s.n || s.value == null) return null;

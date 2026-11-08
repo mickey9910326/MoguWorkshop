@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   LEVELS, P95_BREAKS, P95_LABELS, permilleLevel, cellPermille,
   pkSteps, pkLabels, pkIndex, p95Index, fmt, winLabel, clampMinutes, overviewUrl, escapeHtml,
-  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain, scoreParts,
+  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain, scoreParts, overviewRows,
 } from '../public/_shared/mabilat/model.js';
 
 test('constants match mabilat', () => {
@@ -74,10 +74,10 @@ test('scoreView maps levels and missing values', () => {
 });
 
 test('scoreLegend comes from the rule', () => {
-  const rule = { levels: [{ key: 'good', label: '好', min: 95 }, { key: 'normal', label: '普通', min: 85 },
+  const rule = { levels: [{ key: 'good', label: '良好', min: 95 }, { key: 'normal', label: '普通', min: 85 },
     { key: 'laggy', label: '微卡', min: 70 }, { key: 'bad', label: '糟糕', min: 0 }] };
   assert.deepEqual(scoreLegend(rule).map((l) => [l.cls, l.label, l.range]),
-    [['good', '好', '≥ 95'], ['normal', '普通', '85–95'], ['serious', '微卡', '70–85'], ['critical', '糟糕', '< 70']]);
+    [['good', '良好', '≥ 95'], ['normal', '普通', '85–95'], ['serious', '微卡', '70–85'], ['critical', '糟糕', '< 70']]);
   assert.deepEqual(scoreLegend(null), []);
 });
 
@@ -89,10 +89,10 @@ test('permille legend shows ranges only', () => {
 
 test('scoreExplain spells out the rule with its own numbers', () => {
   const rule = { window_min: 60, start_ms: 6, cap_ms: 100, slow_ms: 4.3, k: 22, k2: 500, min_samples: 5400,
-    levels: [{ key: 'good', label: '好', min: 95 }, { key: 'normal', label: '普通', min: 85 },
+    levels: [{ key: 'good', label: '良好', min: 95 }, { key: 'normal', label: '普通', min: 85 },
       { key: 'laggy', label: '微卡', min: 70 }, { key: 'bad', label: '糟糕', min: 0 }] };
   const text = scoreExplain(rule).join(' ');
-  for (const part of ['HighPing', 'SlowPing', '近 60 分鐘', '超過 6 ms', '100 ms', '4.3', '÷ 22', '÷ 500', '4.3 分', '1.1 分', '5,400', '好 ≥ 95', '糟糕 < 70']) {
+  for (const part of ['HighPing', 'SlowPing', '近 60 分鐘', '超過 6 ms', '100 ms', '4.3', '÷ 22', '÷ 500', '4.3 分', '1.1 分', '5,400', '良好 ≥ 95', '糟糕 < 70']) {
     assert.ok(text.includes(part), part);
   }
   assert.ok(!/卡頓量|慢 ping 量/.test(text));
@@ -110,4 +110,14 @@ test('scoreParts turns D and S into points deducted', () => {
   assert.equal(scoreParts({ d: 0, s: 0, n: 0 }, rule), null);
   assert.equal(scoreParts(null, rule), null);
   assert.equal(scoreParts({ d: 1, s: 1, n: 10 }, null), null);
+});
+
+test('overviewRows lays channels out as CH1–CH13 and HOUSE by server', () => {
+  const ch = (server, channel) => ({ server, channel });
+  const chans = [ch('貝婷', 'CH2'), ch('娜歐', 'HOUSE'), ch('娜歐', 'CH2'), ch('愛麗沙', 'CH10'), ch('娜歐', 'CH10')];
+  const rows = overviewRows(chans, ['娜歐', '貝婷', '愛麗沙']);
+  assert.deepEqual(rows.map((r) => r.channel), ['CH2', 'CH10', 'HOUSE']);
+  assert.deepEqual(rows[0].cells.map((c) => c && c.server), ['娜歐', '貝婷', null]);
+  assert.deepEqual(rows[1].cells.map((c) => c && c.server), ['娜歐', null, '愛麗沙']);
+  assert.deepEqual(overviewRows([], ['娜歐']), []);
 });

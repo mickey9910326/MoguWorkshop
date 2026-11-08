@@ -1,12 +1,13 @@
 import {
   LEVEL_RANGES, P95_LABELS, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
-  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts,
+  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts, overviewRows,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
 // api/overview (proxied to mabilat through the tunnel); nothing else is sent.
 const POLL_MS = 5000;
-const SERVERS = ['全部', '娜歐', '貝婷', '愛麗沙'];
+const SERVERS = ['總覽', '娜歐', '貝婷', '愛麗沙', '全部'];
+const NAMES = ['娜歐', '貝婷', '愛麗沙'];
 const WINDOWS = [15, 30, 60, 1440];
 const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
 const pkVar = (n, bucket) => `var(--pk-${pkIndex(n, bucket)})`;
@@ -18,7 +19,7 @@ const store = {
   set(k, v) { try { localStorage.setItem('mabilat.' + k, JSON.stringify(v)); } catch {} },
 };
 const state = {
-  server: store.get('server', '娜歐'),
+  server: SERVERS.includes(store.get('server', '總覽')) ? store.get('server', '總覽') : '總覽',
   minutes: WINDOWS.includes(store.get('minutes', 60)) ? store.get('minutes', 60) : 60,
   data: null,
 };
@@ -49,7 +50,8 @@ function renderFilters() {
   seg($('f-window'), WINDOWS, state.minutes, winLabel, v => { state.minutes = +v; store.set('minutes', +v); renderFilters(); poll(); });
 }
 
-const visible = () => (state.data ? state.data.channels : []).filter(c => state.server === '全部' || c.server === state.server);
+const showsAll = () => state.server === '全部' || state.server === '總覽';
+const visible = () => (state.data ? state.data.channels : []).filter(c => showsAll() || c.server === state.server);
 const bucketOf = () => (state.data && state.data.bucket_s) || 60;
 const timeLabel = (t, bucket) => `${hhmm(t)}${bucket > 60 ? `–${hhmm(t + bucket)}` : ''}`;
 
@@ -128,7 +130,23 @@ function renderExplain() {
 
 const scoreTag = c => { const v = scoreView(c.score); return `<span class="lvl ${v.cls}"><i></i>${v.text} ${esc(v.label)}</span>`; };
 
+function renderOverview(chs) {
+  const chip = c => {
+    if (!c) return '<span class="ov-none">–</span>';
+    const v = scoreView(c.score);
+    return `<span class="chip lvl-${v.cls}" title="${esc(c.server)} ${esc(c.channel)} 近 60 分鐘分數"><span class="v">${v.text}</span><span class="l">${esc(v.label)}</span></span>`;
+  };
+  $('tiles').innerHTML = chs.length
+    ? '<div class="scroll-x"><table class="ov"><thead><tr><th>頻道</th>' + NAMES.map(n => `<th>${esc(n)}</th>`).join('') + '</tr></thead><tbody>' +
+      overviewRows(chs, NAMES).map(r => `<tr><td class="ch">${esc(r.channel)}</td>${r.cells.map(c => `<td>${chip(c)}</td>`).join('')}</tr>`).join('') +
+      '</tbody></table></div>'
+    : `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;
+}
+
 function renderTiles(chs) {
+  const ov = state.server === '總覽';
+  $('tiles').className = ov ? 'ov-wrap' : 'tiles';
+  if (ov) { renderOverview(chs); return; }
   const rule = state.data && state.data.score_rule;
   $('tiles').innerHTML = chs.map(c => {
     const l = scoreView(c.score), pp = scoreParts(c.score, rule);
