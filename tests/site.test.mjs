@@ -186,10 +186,9 @@ test('mabilat page content is in the HTML', () => {
     '<link rel="stylesheet" href="/_shared/mabilat/mabilat.css">',
     '<script type="module" src="/_shared/mabilat/page.js"></script>',
   ]) assert.ok(html.includes(text), `mabilat: ${text}`);
-  assert.match(html, /id="score-summary"/);
+  assert.doesNotMatch(html, /id="score-summary"|近 60 分鐘分數/);
   for (const id of ['timeline', 'tl-chart', 'peaks', 'events']) assert.doesNotMatch(html, new RegExp(`id="${id}"`));
   assert.doesNotMatch(html, /爆PING 時間軸|爆PING 紀錄|連線事件/);
-  assert.ok(html.includes('近 60 分鐘分數'));
   assert.ok(html.includes('<noscript>'), 'says it needs JS');
 });
 
