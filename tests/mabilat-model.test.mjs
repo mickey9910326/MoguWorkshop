@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   LEVELS, P95_BREAKS, P95_LABELS, permilleLevel, cellPermille,
   pkSteps, pkLabels, pkIndex, p95Index, fmt, winLabel, clampMinutes, overviewUrl, escapeHtml,
-  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain, scoreParts, overviewRows,
+  SCORE_CLS, SCORE_LABEL, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain, scoreParts, overviewRows,
 } from '../public/_shared/mabilat/model.js';
 
 test('constants match mabilat', () => {
@@ -120,4 +120,14 @@ test('overviewRows lays channels out as CH1–CH13 and HOUSE by server', () => {
   assert.deepEqual(rows[0].cells.map((c) => c && c.server), ['娜歐', '貝婷', null]);
   assert.deepEqual(rows[1].cells.map((c) => c && c.server), ['娜歐', null, '愛麗沙']);
   assert.deepEqual(overviewRows([], ['娜歐']), []);
+});
+
+test('level wording comes from the page, not the API', () => {
+  assert.deepEqual(SCORE_LABEL, { good: '良好', normal: '普通', laggy: '微卡', bad: '糟糕', na: '樣本不足' });
+  assert.equal(scoreView({ value: 97, level: 'good', label: '好' }).label, '良好');
+  assert.equal(scoreView({ value: 97, level: 'good' }).label, '良好');
+  assert.equal(scoreView({ value: null, level: 'na' }).label, '樣本不足');
+  const rule = { levels: [{ key: 'good', label: '好', min: 95 }, { key: 'normal', label: 'x', min: 85 },
+    { key: 'laggy', label: 'y', min: 70 }, { key: 'bad', label: 'z', min: 0 }] };
+  assert.deepEqual(scoreLegend(rule).map((l) => l.label), ['良好', '普通', '微卡', '糟糕']);
 });

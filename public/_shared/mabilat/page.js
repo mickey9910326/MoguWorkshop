@@ -1,6 +1,6 @@
 import {
   LEVEL_RANGES, P95_LABELS, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
-  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts, overviewRows,
+  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts, overviewRows, SCORE_LABEL,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
@@ -120,7 +120,7 @@ function renderHeat95(chs) {
 function renderLvlLegend() {
   $('lvl-legend').innerHTML = scoreLegend(state.data && state.data.score_rule)
     .map(l => `<span class="lvl ${l.cls}"><i></i>${l.label} ${l.range}</span>`).join('') +
-    `<span class="lvl na"><i></i>樣本不足</span>`;
+    `<span class="lvl na"><i></i>${SCORE_LABEL.na}</span>`;
 }
 
 function renderExplain() {

@@ -17,15 +17,17 @@ export const LEVEL_RANGES = LEVELS.map(({ cls, range }) => ({ cls, range }));
 // Hourly score: mabilat sends the value, level and rule; the page only maps
 // levels to the shared status colours.
 export const SCORE_CLS = { good: 'good', normal: 'normal', laggy: 'serious', bad: 'critical', na: 'na' };
+// Level wording is page copy; mabilat only decides the level key.
+export const SCORE_LABEL = { good: '良好', normal: '普通', laggy: '微卡', bad: '糟糕', na: '樣本不足' };
 export function scoreView(s) {
   if (!s) return { cls: 'na', label: '載入中', text: '–' };
-  return { cls: SCORE_CLS[s.level] || 'na', label: s.label, text: s.value == null ? '–' : s.value.toFixed(1) };
+  return { cls: SCORE_CLS[s.level] || 'na', label: SCORE_LABEL[s.level] || s.label, text: s.value == null ? '–' : s.value.toFixed(1) };
 }
 export function scoreLegend(rule) {
   const lv = rule?.levels || [];
   return lv.map((l, i) => ({
     cls: SCORE_CLS[l.key] || 'na',
-    label: l.label,
+    label: SCORE_LABEL[l.key] || l.label,
     range: i === 0 ? `≥ ${l.min}` : i === lv.length - 1 ? `< ${lv[i - 1].min}` : `${l.min}–${lv[i - 1].min}`,
   }));
 }
