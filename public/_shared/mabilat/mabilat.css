@@ -149,3 +149,11 @@ table.ov td.ch { color: var(--text-secondary); font-weight: 600; width: 72px; }
 .chip .v { font-weight: 700; font-size: 14.5px; min-width: 2.6em; }
 .chip .l { font-size: 12px; font-weight: 650; color: var(--lv); }
 .ov-none { color: var(--text-muted); }
+/* phones: all three servers must fit without sideways scrolling */
+@media (max-width: 480px) {
+  table.ov th, table.ov td { padding: 4px 3px; }
+  table.ov td.ch { width: auto; font-size: 12.5px; }
+  .chip { gap: 3px; padding: 1px 6px 1px 5px; }
+  .chip .v { font-size: 13.5px; min-width: 0; }
+  .chip .l { font-size: 11px; }
+}
