@@ -48,16 +48,6 @@
       <summary><h2>頻道</h2></summary>
       <p class="desc">大字是近 60 分鐘的分數；下方是這段時間範圍的 p50（平常的 ping）、p95 與爆PING率（每 1000 次 PING 中延遲 ≥ 100 ms 的次數）。</p>
       <div class="legend lvl-legend" id="lvl-legend"></div>
-      <details class="note">
-        <summary>說明</summary>
-        <ul>
-          <li>PING：每個頻道保持一條連線，每 0.5 秒送一個小封包，伺服器原樣回傳，量來回時間。</li>
-          <li>爆PING：延遲 ≥ 100 ms。實測幾乎都是封包掉了、等重傳補回，會卡約 0.3 秒；遊戲走 TCP，一個封包掉了後面都得等，所以跟體感卡頓最相關。</li>
-          <li>分數：近 60 分鐘每次 PING 超過 6 ms 的部分（100 ms 以上以 100 ms 計）加上 4.3–6 ms 的慢 ping 一起扣分，換算成 0–100；不受上方時間範圍影響。少於 5,400 次 PING 時不給分。</li>
-          <li>p50、p95 是整段時間範圍內所有 PING 合計的統計；近一天的數值由直方圖推估，誤差約 2%。</li>
-          <li>「全域」爆PING：多個頻道在同一秒同時發生，多半是本機線路的問題，與頻道無關。</li>
-        </ul>
-      </details>
       <div class="tiles" id="tiles"></div>
     </details>
   </section>
@@ -85,6 +75,21 @@
       <summary><h2>表格檢視 <span class="count" id="table-count"></span></h2></summary>
       <div class="scroll-x"><table id="table"></table></div>
     </details>
+  </section>
+
+  <section class="card" id="about">
+    <h2>取樣與分數說明</h2>
+    <h3>取樣方式</h3>
+    <ul class="about">
+      <li>量測端：一台在台灣、使用中華電信網路的電腦，不登入遊戲；結果只代表這條線路。</li>
+      <li>對象：娜歐、貝婷、愛麗沙三台伺服器，每台 CH1–CH13 與 HOUSE，共 42 個頻道，每個頻道各保持一條連線。</li>
+      <li>PING：每 0.5 秒送一個小封包，伺服器原樣回傳，量來回時間。</li>
+      <li>每條連線用滿 5 分鐘就重新連線，換一條網路路徑；每條連線的第一筆不計（剛連上時偏高）。沒有回應的算逾時，不計入延遲。</li>
+      <li>爆PING：延遲 ≥ 100 ms。實測幾乎都是封包掉了、等重傳補回，會卡約 0.3 秒；遊戲走 TCP，一個封包掉了後面都得等，所以跟體感卡頓最相關。爆PING率是每 1000 次 PING 中的次數（‰）。</li>
+      <li>p50、p95：上方所選時間範圍內所有 PING 合計的統計（一半／95% 的 PING 低於這個值）；近一天的數值由直方圖推估，誤差約 2%。</li>
+    </ul>
+    <h3>分數計算</h3>
+    <ul class="about" id="score-explain"><li>載入中…</li></ul>
   </section>
 
   <noscript><p class="err">這個頁面需要 JavaScript 才能顯示即時資料。</p></noscript>

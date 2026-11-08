@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   LEVELS, P95_BREAKS, P95_LABELS, permilleLevel, cellPermille,
   pkSteps, pkLabels, pkIndex, p95Index, fmt, winLabel, clampMinutes, overviewUrl, escapeHtml,
-  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES,
+  SCORE_CLS, scoreView, scoreLegend, LEVEL_RANGES, scoreExplain,
 } from '../public/_shared/mabilat/model.js';
 
 test('constants match mabilat', () => {
@@ -85,4 +85,15 @@ test('permille legend shows ranges only', () => {
   assert.deepEqual(LEVEL_RANGES.map((l) => [l.cls, l.range]),
     [['good', '< 1‰'], ['warning', '1–3‰'], ['serious', '3–5‰'], ['critical', '≥ 5‰']]);
   for (const l of LEVEL_RANGES) assert.equal(l.label, undefined);
+});
+
+test('scoreExplain spells out the rule with its own numbers', () => {
+  const rule = { window_min: 60, start_ms: 6, cap_ms: 100, slow_ms: 4.3, k: 22, k2: 500, min_samples: 5400,
+    levels: [{ key: 'good', label: '好', min: 95 }, { key: 'normal', label: '普通', min: 85 },
+      { key: 'laggy', label: '微卡', min: 70 }, { key: 'bad', label: '糟糕', min: 0 }] };
+  const text = scoreExplain(rule).join(' ');
+  for (const part of ['近 60 分鐘', '超過 6 ms', '100 ms', '4.3', '÷ 22', '÷ 500', '4.3 分', '1.1 分', '5,400', '好 ≥ 95', '糟糕 < 70']) {
+    assert.ok(text.includes(part), part);
+  }
+  assert.deepEqual(scoreExplain(null), []);
 });

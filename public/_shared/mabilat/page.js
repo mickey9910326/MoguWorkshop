@@ -1,6 +1,6 @@
 import {
   LEVEL_RANGES, P95_LABELS, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
-  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend,
+  fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
@@ -136,6 +136,11 @@ function renderLvlLegend() {
     `<span class="lvl na"><i></i>樣本不足</span>`;
 }
 
+function renderExplain() {
+  const lines = scoreExplain(state.data && state.data.score_rule);
+  $('score-explain').innerHTML = lines.map(l => `<li>${esc(l)}</li>`).join('') || '<li>載入中…</li>';
+}
+
 const scoreTag = c => { const v = scoreView(c.score); return `<span class="lvl ${v.cls}"><i></i>${v.text} ${esc(v.label)}</span>`; };
 
 function renderTiles(chs) {
@@ -166,7 +171,7 @@ function render() {
   const npk = chs.reduce((a, c) => a + c.peaks, 0);
   if (loading()) $('sub').textContent = '伺服器剛重啟，載入資料中，約需一分鐘…';
   else if (state.data) $('sub').textContent = `${winLabel(state.minutes)} · ${up}/${chs.length} 個頻道連線中 · 爆PING ${npk} 次 · 更新於 ${hhmmss(state.data.now)}`;
-  renderLvlLegend();
+  renderLvlLegend(); renderExplain();
   renderTiles(chs); renderHeat(chs); renderHeat95(chs); renderTable(chs);
 }
 

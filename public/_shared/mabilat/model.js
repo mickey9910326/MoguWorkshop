@@ -30,7 +30,27 @@ export function scoreLegend(rule) {
   }));
 }
 
-export const cellPermille = (m) => (m.n ? 1000 * m.peaks / m.n : null);
+// Plain-text lines explaining the score, built from the API's rule so the
+// numbers on the page always match what mabilat computes.
+export function scoreExplain(rule) {
+  if (!rule) return [];
+  const { window_min: w, start_ms: st, cap_ms: cap, slow_ms: sl, k, k2, min_samples: min } = rule;
+  const full = w * 120;
+  const levels = scoreLegend(rule).map((l) => `${l.label} ${l.range}`).join('、');
+  return [
+    `只看近 ${w} 分鐘，與上方選的時間範圍無關，每 5 秒更新。`,
+    `卡頓量：每次 PING 超過 ${st} ms 的部分加總，超過 ${cap} ms 的以 ${cap} ms 計。`,
+    `慢 ping 量：每次 PING 落在 ${sl}–${st} ms 時，超出 ${sl} ms 的部分加總。`,
+    `分數 = 100 − (卡頓量 ÷ ${k} + 慢 ping 量 ÷ ${k2}) × ${full.toLocaleString('en-US')} ÷ PING 次數，最低 0 分；` +
+      `${full.toLocaleString('en-US')} 是 ${w} 分鐘每 0.5 秒一次的滿額次數。`,
+    `換算：一次 ≥ ${cap} ms 的爆PING 約扣 ${((cap - st) / k).toFixed(1)} 分，一次 30 ms 約扣 ${((30 - st) / k).toFixed(1)} 分；` +
+      `約 5.8 ms 的慢 ping 佔一成時約扣 ${((full * 0.1 * (5.8 - sl)) / k2).toFixed(1)} 分。`,
+    `等級：${levels}。`,
+    `近 ${w} 分鐘成功的 PING 少於 ${min.toLocaleString('en-US')} 次時不給分（顯示「樣本不足」）。`,
+  ];
+}
+
+export const cellPermille =(m) => (m.n ? 1000 * m.peaks / m.n : null);
 export const permilleLevel = (v) => LEVELS.find((l) => v < l.max);
 
 // Peak count per heatmap cell in four steps; wider cells get wider steps.
