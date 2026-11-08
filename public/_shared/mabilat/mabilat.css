@@ -135,7 +135,6 @@ details.note ul { margin: 6px 0 0; padding-left: 18px; }
 .tile.lvl-na .score .lv { color: var(--text-muted); }
 .tile .ln { font-size: 11.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; line-height: 1.55; }
 .tile .ln b { color: var(--text-primary); font-weight: 600; }
-.tile .ln span { white-space: nowrap; }
 
 /* overview: channel × server table, the score as a small tinted chip */
 table.ov { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
@@ -156,4 +155,14 @@ table.ov td.ch { color: var(--text-secondary); font-weight: 600; width: 72px; }
   .chip { gap: 3px; padding: 1px 6px 1px 5px; }
   .chip .v { font-size: 13.5px; min-width: 0; }
   .chip .l { font-size: 11px; }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .tile { padding: 6px 8px 7px; }
+  .tile .name { font-size: 12px; }
+  .tile .score .v { font-size: 20px; }
+  .tile .score .lv { font-size: 11px; }
+  .tile .ln { font-size: 10.5px; }
+  .seg button { font-size: 13px; padding: 5px 9px; white-space: nowrap; }
+  .sub { font-size: 12px; }
+  .tile .ln { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .ln .lg { display: none; }
 }
