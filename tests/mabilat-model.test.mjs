@@ -62,11 +62,11 @@ test('a reply only counts if it is for the window now selected', async () => {
 });
 
 test('scoreView maps levels and missing values', () => {
-  assert.deepEqual(scoreView({ value: 94.96, level: 'normal', label: '普通' }), { cls: 'normal', label: '普通', text: '94' });
-  assert.equal(scoreView({ value: 84.5, level: 'laggy', label: '微卡' }).text, '84');
-  assert.equal(scoreView({ value: 69.9, level: 'bad', label: '糟糕' }).text, '69');
-  assert.deepEqual(scoreView({ value: 60, level: 'bad', label: '糟糕' }), { cls: 'critical', label: '糟糕', text: '60' });
-  assert.deepEqual(scoreView({ value: 72, level: 'laggy', label: '微卡' }), { cls: 'serious', label: '微卡', text: '72' });
+  assert.deepEqual(scoreView({ value: 94.9, level: 'normal', label: '普通' }), { cls: 'normal', label: '普通', text: '94.9' });
+  assert.equal(scoreView({ value: 84.5, level: 'laggy', label: '微卡' }).text, '84.5');
+  assert.equal(scoreView({ value: 69.9, level: 'bad', label: '糟糕' }).text, '69.9');
+  assert.deepEqual(scoreView({ value: 60, level: 'bad', label: '糟糕' }), { cls: 'critical', label: '糟糕', text: '60.0' });
+  assert.deepEqual(scoreView({ value: 72, level: 'laggy', label: '微卡' }), { cls: 'serious', label: '微卡', text: '72.0' });
   assert.deepEqual(scoreView({ value: null, level: 'na', label: '樣本不足' }), { cls: 'na', label: '樣本不足', text: '–' });
   assert.deepEqual(scoreView(null), { cls: 'na', label: '載入中', text: '–' });
   assert.deepEqual(scoreView(undefined), { cls: 'na', label: '載入中', text: '–' });

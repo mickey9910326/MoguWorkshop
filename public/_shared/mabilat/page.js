@@ -152,11 +152,10 @@ function renderTiles(chs) {
     const l = scoreView(c.score);
     return `
     <div class="tile lvl-${l.cls}">
-      <div class="top"><span class="name">${esc(c.server)} ${esc(c.channel)}${c.status === 'up' ? '' : ` <span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</span>
-        <span class="pm ${l.cls}" title="近 60 分鐘分數（${esc(l.label)}）"><i></i>${l.text} ${esc(l.label)}</span></div>
-      <div class="big">${fmt(c.p50)} <small>ms</small></div>
-      <div class="meta">p95 ${fmt(c.p95)} ms${c.loss_pct > 0 ? ` · 遺失 ${fmt(c.loss_pct, 1)}%` : ''}</div>
-      <div class="peaks" title="爆PING 次數／成功的 PING 次數">爆PING <b>${c.peaks}</b>／${c.n.toLocaleString('en-US')} 次${c.peaks !== c.peaks_local ? `（全域 ${c.peaks - c.peaks_local}）` : ''}</div>
+      <div class="top"><span class="name">${esc(c.server)} ${esc(c.channel)}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>
+      <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lvl ${l.cls}"><i></i>${esc(l.label)}</span></div>
+      <div class="meta">p50 <b>${fmt(c.p50)}</b> ms · p95 <b>${fmt(c.p95)}</b> ms</div>
+      <div class="peaks" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING率 <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks} 次）</div>
       ${spark(c)}
     </div>`;
   }).join('') || `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;

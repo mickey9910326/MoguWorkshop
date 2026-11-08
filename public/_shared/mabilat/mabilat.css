@@ -131,3 +131,9 @@ details.note ul { margin: 6px 0 0; padding-left: 18px; }
 .sum-box { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--surface-1); }
 .sum-box .name { font-weight: 650; }
 .sum-box .v { font-size: 28px; font-weight: 650; font-variant-numeric: tabular-nums; margin: 2px 0 4px; }
+
+/* channel card: the hourly score is the headline */
+.tile .score { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 6px 0 4px; }
+.tile .score .v { font-size: 34px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile .meta b { color: var(--text-primary); font-weight: 600; }
+.tile .meta, .tile .peaks { text-align: center; }

@@ -19,7 +19,7 @@ export const LEVEL_RANGES = LEVELS.map(({ cls, range }) => ({ cls, range }));
 export const SCORE_CLS = { good: 'good', normal: 'normal', laggy: 'serious', bad: 'critical', na: 'na' };
 export function scoreView(s) {
   if (!s) return { cls: 'na', label: '載入中', text: '–' };
-  return { cls: SCORE_CLS[s.level] || 'na', label: s.label, text: s.value == null ? '–' : String(Math.floor(s.value)) };
+  return { cls: SCORE_CLS[s.level] || 'na', label: s.label, text: s.value == null ? '–' : s.value.toFixed(1) };
 }
 export function scoreLegend(rule) {
   const lv = rule?.levels || [];
