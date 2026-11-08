@@ -39,12 +39,12 @@ export function scoreExplain(rule) {
   const levels = scoreLegend(rule).map((l) => `${l.label} ${l.range}`).join('、');
   return [
     `只看近 ${w} 分鐘，與上方選的時間範圍無關，每 5 秒更新。`,
-    `卡頓量：每次 PING 超過 ${st} ms 的部分加總，超過 ${cap} ms 的以 ${cap} ms 計。`,
-    `慢 ping 量：每次 PING 落在 ${sl}–${st} ms 時，超出 ${sl} ms 的部分加總。`,
-    `分數 = 100 − (卡頓量 ÷ ${k} + 慢 ping 量 ÷ ${k2}) × ${full.toLocaleString('en-US')} ÷ PING 次數，最低 0 分；` +
+    `HighPing：每次 PING 超過 ${st} ms 的部分加總，超過 ${cap} ms 的以 ${cap} ms 計。`,
+    `SlowPing：每次 PING 落在 ${sl}–${st} ms 時，超出 ${sl} ms 的部分加總。`,
+    `分數 = 100 − (HighPing ÷ ${k} + SlowPing ÷ ${k2}) × ${full.toLocaleString('en-US')} ÷ PING 次數，最低 0 分；` +
       `${full.toLocaleString('en-US')} 是 ${w} 分鐘每 0.5 秒一次的滿額次數。`,
     `換算：一次 ≥ ${cap} ms 的爆PING 約扣 ${((cap - st) / k).toFixed(1)} 分，一次 30 ms 約扣 ${((30 - st) / k).toFixed(1)} 分；` +
-      `約 5.8 ms 的慢 ping 佔一成時約扣 ${((full * 0.1 * (5.8 - sl)) / k2).toFixed(1)} 分。`,
+      `約 5.8 ms 的 SlowPing 佔一成時約扣 ${((full * 0.1 * (5.8 - sl)) / k2).toFixed(1)} 分。`,
     `等級：${levels}。`,
     `近 ${w} 分鐘成功的 PING 少於 ${min.toLocaleString('en-US')} 次時不給分（顯示「樣本不足」）。`,
   ];

@@ -92,8 +92,9 @@ test('scoreExplain spells out the rule with its own numbers', () => {
     levels: [{ key: 'good', label: '好', min: 95 }, { key: 'normal', label: '普通', min: 85 },
       { key: 'laggy', label: '微卡', min: 70 }, { key: 'bad', label: '糟糕', min: 0 }] };
   const text = scoreExplain(rule).join(' ');
-  for (const part of ['近 60 分鐘', '超過 6 ms', '100 ms', '4.3', '÷ 22', '÷ 500', '4.3 分', '1.1 分', '5,400', '好 ≥ 95', '糟糕 < 70']) {
+  for (const part of ['HighPing', 'SlowPing', '近 60 分鐘', '超過 6 ms', '100 ms', '4.3', '÷ 22', '÷ 500', '4.3 分', '1.1 分', '5,400', '好 ≥ 95', '糟糕 < 70']) {
     assert.ok(text.includes(part), part);
   }
+  assert.ok(!/卡頓量|慢 ping 量/.test(text));
   assert.deepEqual(scoreExplain(null), []);
 });

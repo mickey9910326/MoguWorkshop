@@ -29,14 +29,6 @@
     <span class="sub" id="sub">載入中…</span>
   </header>
   <p class="intro">瑪奇台服各頻道的網路延遲，以不登入的 PING 連線量測，每 0.5 秒量測一次。資料來自單一家用網路(中華電信IP)，只代表這條線路，僅供參考</p>
-  <div class="notice" role="note">
-    <span class="icon" aria-hidden="true">⚠</span>
-    <div>
-      <p><b>各指標仍在測試中，目前只能反映這條網路線路的狀況，無法用來判斷頻道或伺服器的好壞。</b></p>
-      <p>延遲與爆PING 主要取決於連線被分配到的網路路徑，同一個頻道重新連線，結果就可能不同。</p>
-    </div>
-  </div>
-
   <div class="filters">
     <div class="seg" id="f-server" role="group" aria-label="伺服器"></div>
     <div class="seg" id="f-window" role="group" aria-label="時間範圍"></div>
@@ -46,7 +38,6 @@
   <section class="card">
     <details class="fold" open>
       <summary><h2>頻道</h2></summary>
-      <p class="desc">大字是近 60 分鐘的分數；下方是這段時間範圍的 p50（平常的 ping）、p95 與爆PING率（每 1000 次 PING 中延遲 ≥ 100 ms 的次數）。</p>
       <div class="legend lvl-legend" id="lvl-legend"></div>
       <div class="tiles" id="tiles"></div>
     </details>

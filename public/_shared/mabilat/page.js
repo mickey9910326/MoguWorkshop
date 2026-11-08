@@ -115,21 +115,6 @@ function renderHeat95(chs) {
     P95_LABELS.map((l, i) => `<span><span class="sw" style="background:var(--p95-${i})"></span>${l} ms</span>`).join(''));
 }
 
-// 卡片走勢線：每個時段的 p50
-function spark(c) {
-  const vals = c.minutes.map(m => m.p50);
-  const ok = vals.filter(v => v != null);
-  if (ok.length < 2) return '<svg></svg>';
-  const lo = Math.min(...ok), hi = Math.max(...ok), span = hi - lo || 1, W = 100, H = 22, n = vals.length;
-  let d = '', pen = false;
-  vals.forEach((v, i) => {
-    if (v == null) { pen = false; return; }
-    const x = (i / (n - 1)) * W, y = H - 3 - ((v - lo) / span) * (H - 6);
-    d += `${pen ? 'L' : 'M'}${x.toFixed(2)},${y.toFixed(2)}`; pen = true;
-  });
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="var(--series-1)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
-}
-
 function renderLvlLegend() {
   $('lvl-legend').innerHTML = scoreLegend(state.data && state.data.score_rule)
     .map(l => `<span class="lvl ${l.cls}"><i></i>${l.label} ${l.range}</span>`).join('') +
@@ -152,7 +137,6 @@ function renderTiles(chs) {
       <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lvl ${l.cls}"><i></i>${esc(l.label)}</span></div>
       <div class="meta">p50 <b>${fmt(c.p50)}</b> ms · p95 <b>${fmt(c.p95)}</b> ms</div>
       <div class="peaks" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING率 <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks} 次）</div>
-      ${spark(c)}
     </div>`;
   }).join('') || `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;
 }
@@ -167,10 +151,8 @@ function renderTable(chs) {
 function render() {
   renderFilters();
   const chs = visible();
-  const up = chs.filter(c => c.status === 'up').length;
-  const npk = chs.reduce((a, c) => a + c.peaks, 0);
   if (loading()) $('sub').textContent = '伺服器剛重啟，載入資料中，約需一分鐘…';
-  else if (state.data) $('sub').textContent = `${winLabel(state.minutes)} · ${up}/${chs.length} 個頻道連線中 · 爆PING ${npk} 次 · 更新於 ${hhmmss(state.data.now)}`;
+  else if (state.data) $('sub').textContent = `${winLabel(state.minutes)} · 更新於 ${hhmmss(state.data.now)}`;
   renderLvlLegend(); renderExplain();
   renderTiles(chs); renderHeat(chs); renderHeat95(chs); renderTable(chs);
 }
