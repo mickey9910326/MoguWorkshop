@@ -176,13 +176,21 @@ function renderTable(chs) {
       `<td class="num">${fmt(c.p50)}</td><td class="num">${fmt(c.p95)}</td><td class="num">${c.peaks}</td></tr>`).join('') + '</tbody>';
 }
 
+// Control points: always tiles, whatever server or overview is picked; hidden when the API has none.
+function renderControl() {
+  const cs = controlTargets(state.data);
+  const rule = state.data && state.data.score_rule;
+  $('control-card').hidden = !cs.length;
+  $('control-tiles').innerHTML = cs.map(c => tileHtml(c, rule, { control: true })).join('');
+}
+
 function render() {
   renderFilters();
   const chs = visible();
   if (loading()) $('sub').textContent = '伺服器剛重啟，載入資料中，約需一分鐘…';
   else if (state.data) $('sub').textContent = `更新於 ${hhmmss(state.data.now)}`;
   renderLvlLegend(); renderExplain();
-  renderTiles(chs); renderHeatScore(chs); renderHeat(chs); renderHeat95(chs); renderTable(chs);
+  renderTiles(chs); renderControl(); renderHeatScore(chs); renderHeat(chs); renderHeat95(chs); renderTable(chs);
 }
 
 // A failed poll keeps the last good data on screen and shows why; the next

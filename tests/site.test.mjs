@@ -255,3 +255,13 @@ test('dev proxy notes say to start a local mabilat with the /mabilat base path',
   const src = readFileSync(join(ROOT, 'tools', 'dev-server.mjs'), 'utf8');
   assert.match(src, /--base-path \/mabilat/);
 });
+
+test('mabilat page has the control card and split sampling notes', () => {
+  const html = pages.find((p) => p.path === '/mabilat/').html;
+  assert.ok(html.includes('id="control-card"') && html.includes('id="control-tiles"'), 'control card');
+  assert.ok(html.indexOf('id="tiles"') < html.indexOf('id="control-card"'), 'after the channel tiles');
+  assert.ok(html.indexOf('id="control-card"') < html.indexOf('id="heat-score"'), 'before the score heatmap');
+  assert.ok(html.includes('<h3>頻道取樣方式</h3>') && html.includes('<h3>對照組取樣方式</h3>'), 'two sampling sections');
+  assert.ok(!html.includes('<h3>取樣方式</h3>'), 'old heading gone');
+  assert.ok(!html.includes('機房') && !html.includes('防火牆'), 'no DC or firewall wording');
+});
