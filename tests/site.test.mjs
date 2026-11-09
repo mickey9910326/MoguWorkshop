@@ -127,8 +127,8 @@ test('mogugi release page content is in the HTML', () => {
   assert.ok(html.includes('<meta property="og:title" content="mogugi‧魔古工坊">'));
   for (const text of [
     `<p class="lead">${desc}</p>`,
-    '<p><b>免費軟體：</b>mogugi 為免費軟體，不收任何費用。如果有人向你收費販售 mogugi，那不是我們提供的，請不要付款，並到 Discord 回報。</p>',
-    '<p><b>OAuth 驗證：</b>第一次開啟會提示需要 Discord 驗證以啟用，需加入魔古工坊 Discord 群組以完成。啟用的效期是 30 天，到期後 mogugi 會請你再用 Discord 登入一次。</p>',
+    '<p><b>免費軟體：</b>mogugi 為免費軟體，不收任何費用。如果有人向你收費販售 mogugi，那不是我們提供的，請不要付款，並到 <a rel="noopener" href="https://discord.gg/AjAuanA8V">Discord</a> 回報。</p>',
+    '<p><b>OAuth 驗證：</b>第一次開啟會提示需要 Discord 驗證（<a rel="noopener" href="https://zh.wikipedia.org/zh-tw/%E9%96%8B%E6%94%BE%E6%8E%88%E6%AC%8A">什麼是 OAuth？</a>）以啟用，需加入 <a rel="noopener" href="https://discord.gg/AjAuanA8V">魔古工坊 Discord 群組</a>以完成。啟用的效期是 30 天，到期後 mogugi 會請你再用 Discord 登入一次。</p>',
     '加入 Discord 群組',
     'https://npcap.com/#download',
     '下載上面的 exe 並執行。',
