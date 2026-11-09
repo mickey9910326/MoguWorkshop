@@ -56,3 +56,11 @@ test('every nav link has an accessible name even when labels are hidden', () => 
 test('brand logo is the 蘑菇雞 image', () => {
   assert.match(BRAND_LOGO, /<img src="\/_shared\/img\/mogu-chicken-64\.png" alt="" width="34" height="34">/);
 });
+
+test('nav Discord link is tracked as discord-nav with the page it was clicked on', () => {
+  const a = discordItem('mogugi');
+  assert.match(a, /^<a [^>]*href="https:\/\/discord\.gg\/AjAuanA8V"/);
+  assert.match(a, / data-umami-event="discord-nav"/);
+  assert.match(a, / data-umami-event-page="mogugi"/);
+  assert.match(discordItem(), / data-umami-event-page="unknown"/);
+});

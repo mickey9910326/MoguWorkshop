@@ -127,8 +127,8 @@ test('mogugi release page content is in the HTML', () => {
   assert.ok(html.includes('<meta property="og:title" content="mogugi‧魔古工坊">'));
   for (const text of [
     `<p class="lead">${desc}</p>`,
-    '<p><b>免費軟體：</b>mogugi 為免費軟體，不收任何費用。如果有人向你收費販售 mogugi，那不是我們提供的，請不要付款，並到 <a rel="noopener" href="https://discord.gg/AjAuanA8V">Discord</a> 回報。</p>',
-    '<p><b>OAuth 驗證：</b>第一次開啟會提示需要 Discord 驗證（<a rel="noopener" href="https://zh.wikipedia.org/zh-tw/%E9%96%8B%E6%94%BE%E6%8E%88%E6%AC%8A">什麼是 OAuth？</a>）以啟用，需加入 <a rel="noopener" href="https://discord.gg/AjAuanA8V">魔古工坊 Discord 群組</a>以完成。啟用的效期是 30 天，到期後 mogugi 會請你再用 Discord 登入一次。</p>',
+    '<p><b>免費軟體：</b>mogugi 為免費軟體，不收任何費用。如果有人向你收費販售 mogugi，那不是我們提供的，請不要付款，並到 <a rel="noopener" href="https://discord.gg/AjAuanA8V" data-umami-event="discord-mogugi-report">Discord</a> 回報。</p>',
+    '<p><b>OAuth 驗證：</b>第一次開啟會提示需要 Discord 驗證（<a rel="noopener" href="https://zh.wikipedia.org/zh-tw/%E9%96%8B%E6%94%BE%E6%8E%88%E6%AC%8A">什麼是 OAuth？</a>）以啟用，需加入 <a rel="noopener" href="https://discord.gg/AjAuanA8V" data-umami-event="discord-mogugi-oauth">魔古工坊 Discord 群組</a>以完成。啟用的效期是 30 天，到期後 mogugi 會請你再用 Discord 登入一次。</p>',
     '加入 Discord 群組',
     'https://npcap.com/#download',
     '下載上面的 exe 並執行。',
@@ -267,4 +267,31 @@ test('mabilat page has the control card and split sampling notes', () => {
   assert.ok(html.includes('最小：') && html.includes('p99'), 'min and p99 explained');
   assert.ok(!html.includes('分數用和頻道同一套公式'), 'control has no score any more');
   assert.ok(!html.includes('機房') && !html.includes('防火牆'), 'no DC or firewall wording');
+});
+
+const UMAMI_SCRIPT = '<script defer src="https://umami.elden-mogu.com/mw.js" ' +
+  'data-website-id="dde7c09f-294c-42ea-9734-59b5b7cd555f" data-domains="mabinogi.elden-mogu.com"></script>';
+
+test('every page loads the Umami tracker once, in <head>, only counting the real host', () => {
+  for (const { path, html } of pages) {
+    const at = html.indexOf(UMAMI_SCRIPT);
+    assert.ok(at > 0 && at < html.indexOf('</head>'), `${path}: Umami script in <head>`);
+    assert.equal(html.split('umami.elden-mogu.com/mw.js').length, 2, `${path}: loaded once`);
+  }
+});
+
+test('every Discord link in the HTML has its own Umami event name', () => {
+  const names = [];
+  for (const { path, html } of pages) {
+    for (const m of html.matchAll(/<a [^>]*href="https:\/\/discord\.gg\/[^"]*"[^>]*>/g)) {
+      const ev = / data-umami-event="(discord-[a-z-]+)"/.exec(m[0]);
+      assert.ok(ev, `${path}: Discord link without data-umami-event: ${m[0]}`);
+      assert.notEqual(ev[1], 'discord-nav', `${path}: discord-nav is reserved for the nav`);
+      names.push(ev[1]);
+    }
+  }
+  assert.deepEqual(names.slice().sort(), [
+    'discord-doll', 'discord-home', 'discord-mogugi',
+    'discord-mogugi-oauth', 'discord-mogugi-report', 'discord-mogugi-steps',
+  ]);
 });

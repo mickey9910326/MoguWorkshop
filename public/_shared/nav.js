@@ -69,8 +69,10 @@ function themeButton() {
   return globalThis.MoguTheme ? '<button type="button" class="item theme-btn"></button>' : '';
 }
 
-export function discordItem() {
-  return '<a class="item" href="' + DISCORD_URL + '" rel="noopener" data-name="Discord" aria-label="Discord">' + svg('discord') + '<span class="label">Discord</span></a>';
+// Umami counts every nav Discord click as one event; the page property says where it was clicked.
+export function discordItem(page) {
+  return '<a class="item" href="' + DISCORD_URL + '" rel="noopener" data-name="Discord" aria-label="Discord"' +
+    ' data-umami-event="discord-nav" data-umami-event-page="' + (page || 'unknown') + '">' + svg('discord') + '<span class="label">Discord</span></a>';
 }
 
 function safeStorage() {
@@ -91,10 +93,10 @@ class EmNav extends HTMLElement {
       '<nav class="rail" aria-label="工具">' +
         '<div class="rail-head"><a class="brand" href="/">' + BRAND_LOGO + '<b>魔古工坊</b></a>' +
         '<button type="button" class="collapse" aria-label="收合導覽欄" title="收合導覽欄">' + svg('chev') + '</button></div>' +
-        itemsHtml(model) + '<div class="grow"></div>' + themeButton() + discordItem() +
+        itemsHtml(model) + '<div class="grow"></div>' + themeButton() + discordItem(current) +
       '</nav>' +
       '<div class="scrim" hidden></div>' +
-      '<nav class="sheet" id="mw-sheet" aria-label="工具" hidden>' + itemsHtml(model) + '<hr>' + themeButton() + discordItem() + '</nav>' +
+      '<nav class="sheet" id="mw-sheet" aria-label="工具" hidden>' + itemsHtml(model) + '<hr>' + themeButton() + discordItem(current) + '</nav>' +
       '<button type="button" class="fab" aria-controls="mw-sheet" aria-expanded="false" aria-label="開啟選單">' + svg(this.fabIcon) + '</button>';
 
     document.documentElement.classList.add('mw-nav-ready');

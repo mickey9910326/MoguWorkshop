@@ -1,0 +1,54 @@
+# umami — 魔古工坊流量統計（部署在 CamaUbuntu，與 mabilat、supermogugi 同一台）。
+#
+#   docker compose up -d
+#   docker compose logs -f umami
+#   docker compose down               # 資料在 named volume umami-db-data，會保留
+#
+# 對外：主機上既有的 cloudflared（token 啟動、路由在 Cloudflare 後台管理），
+# 在該 tunnel 加 Public Hostname：umami.elden-mogu.com → HTTP localhost:3000。
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  umami:
+    image: ghcr.io/umami-software/umami:3.4.0
+    container_name: umami
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://umami:${POSTGRES_PASSWORD}@db:5432/umami
+      APP_SECRET: ${APP_SECRET}
+      # 換掉預設的 script.js 和 /api/send，降低被擋廣告外掛封鎖的機率
+      TRACKER_SCRIPT_NAME: mw.js
+      COLLECT_API_ENDPOINT: /api/mw
+      TZ: Asia/Taipei
+    depends_on:
+      db:
+        condition: service_healthy
+    # 只綁 loopback：只有主機上的 cloudflared 能轉進來
+    ports:
+      - "127.0.0.1:3000:3000"
+    logging: *logging
+
+  db:
+    image: postgres:17-alpine
+    container_name: umami-db
+    restart: always
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+
+volumes:
+  umami-db-data:
