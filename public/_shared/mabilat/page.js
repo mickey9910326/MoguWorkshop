@@ -105,7 +105,7 @@ function renderHeat(chs) {
       pkLabels(bucket).map((l, i) => `<span><span class="sw" style="background:var(--pk-${i + 1})"></span>${l} 次</span>`).join('');
   renderGrid($('heat'), $('legend'), chs,
     m => dayMode() ? levelFill(permilleLevel(cellPermille(m))) : pkVar(m.peaks, bucket),
-    m => `爆PING <b>${m.peaks}</b> 次（${fmt(cellPermille(m), 2)}‰）· p50 ${fmt(m.p50)} ms`, legend);
+    m => `爆PING <b>${m.peaks}</b> 次（${fmt(cellPermille(m), 2)}‰）‧ p50 ${fmt(m.p50)} ms`, legend);
 }
 
 // 每格是到該時段結束為止的近 60 分鐘分數，顏色用分數等級
@@ -128,7 +128,7 @@ function renderHeat95(chs) {
   $('p95-title').textContent = bucket > 60 ? `每 ${bucket / 60} 分鐘 p95` : '每分鐘 p95';
   renderGrid($('heat95'), $('legend95'), chs,
     m => m.p95 == null ? null : p95Var(m.p95),
-    m => `p95 <b>${fmt(m.p95)} ms</b> · p50 ${fmt(m.p50)} ms`,
+    m => `p95 <b>${fmt(m.p95)} ms</b> ‧ p50 ${fmt(m.p50)} ms`,
     P95_LABELS.map((l, i) => `<span><span class="sw" style="background:var(--p95-${i})"></span>${l} ms</span>`).join(''));
 }
 
@@ -169,9 +169,9 @@ function renderTiles(chs) {
     <div class="tile lvl-${l.cls}">
       <div class="top"><span class="name">${esc(c.server)} ${esc(c.channel)}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>
       <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span></div>
-      <div class="ln">p50 <b>${fmt(c.p50)}</b> · p95 <b>${fmt(c.p95)}</b><span class="lg"> ms</span></div>
-      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg">扣分</span> <b>−${pp.hp.toFixed(1)}</b> · SP<span class="lg">扣分</span> <b>−${pp.sp.toFixed(1)}</b></div>` : ''}
-      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg">率</span> <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks}<span class="lg"> </span>次）</div>
+      <div class="ln">p50 <b>${fmt(c.p50)}</b> ‧ p95 <b>${fmt(c.p95)}</b><span class="lg"> ms</span></div>
+      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−${pp.hp.toFixed(1)}</b> ‧ SP<span class="lg"> 扣分</span> <b>−${pp.sp.toFixed(1)}</b></div>` : ''}
+      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg"> 率</span> <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks}<span class="lg"> </span>次）</div>
     </div>`;
   }).join('') || `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;
 }
@@ -180,7 +180,7 @@ function renderTable(chs) {
   const rule = state.data && state.data.score_rule;
   const part = (c, k) => { const pp = scoreParts(c.score, rule); return pp ? `−${pp[k].toFixed(1)}` : '–'; };
   $('table-count').textContent = chs.length ? `${chs.length} 個頻道` : '';
-  $('table').innerHTML = '<thead><tr><th>伺服器</th><th>頻道</th><th>狀態</th><th>分數</th><th class="num">HP扣分</th><th class="num">SP扣分</th><th class="num">p50</th><th class="num">p95</th><th class="num">爆PING 次數</th></tr></thead><tbody>' +
+  $('table').innerHTML = '<thead><tr><th>伺服器</th><th>頻道</th><th>狀態</th><th>分數</th><th class="num">HP 扣分</th><th class="num">SP 扣分</th><th class="num">p50</th><th class="num">p95</th><th class="num">爆PING 次數</th></tr></thead><tbody>' +
     chs.map(c => `<tr><td>${esc(c.server)}</td><td>${esc(c.channel)}</td><td>${STATUS_TEXT[c.status]}</td><td>${scoreTag(c)}</td>` +
       `<td class="num">${part(c, 'hp')}</td><td class="num">${part(c, 'sp')}</td>` +
       `<td class="num">${fmt(c.p50)}</td><td class="num">${fmt(c.p95)}</td><td class="num">${c.peaks}</td></tr>`).join('') + '</tbody>';

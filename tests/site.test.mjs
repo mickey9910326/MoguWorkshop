@@ -13,7 +13,7 @@ const HOST = 'mabinogi.elden-mogu.com';
 // Paths on this host that are served by something other than this site.
 export const ALLOWED_ORIGIN_PATHS = [];
 
-const FOOTER = '魔古工坊 · 非官方玩家工具，與遊戲營運商無關';
+const FOOTER = '魔古工坊 ‧ 非官方玩家工具，與遊戲營運商無關';
 
 function htmlFiles(dir = PUBLIC) {
   return readdirSync(dir).flatMap((name) => {
@@ -98,10 +98,10 @@ test('NAV_ITEMS internal hrefs resolve the same way', () => {
 
 test('main content is in the HTML, not injected by JS', () => {
   const home = pages.find((p) => p.path === '/').html;
-  for (const text of ['魔古工坊', 'mogugi', 'mabilat', '人偶傷害計算機', '加入伺服器', 'https://discord.gg/AjAuanA8V']) {
+  for (const text of ['魔古工坊', 'mogugi', 'mabilat', '人偶傷害計算機', '加入群組', 'https://discord.gg/AjAuanA8V']) {
     assert.ok(home.includes(text), `home: ${text}`);
   }
-  assert.ok(home.includes('傷害計量器，並附有物品索引、狀態機制提醒、戰鬥記錄等功能。'), 'home: mogugi blurb');
+  assert.ok(home.includes('傷害統計工具，另有物品索引、CC 提醒、戰鬥紀錄等功能。'), 'home: mogugi blurb');
   assert.ok(home.includes('試算旋律人偶師的傷害、技能倍率、裝備效益。'), 'home: doll blurb');
   assert.ok(home.includes('src="/_shared/img/mogugi.png"'), 'home: mogugi icon');
   assert.ok(!home.includes('娜歐／貝婷／愛麗沙'), 'home: server eyebrow removed');
@@ -119,19 +119,16 @@ test('main content is in the HTML, not injected by JS', () => {
 
 test('mogugi release page content is in the HTML', () => {
   const html = pages.find((p) => p.path === '/mogugi/').html;
-  assert.match(html, /<title>mogugi・魔古工坊<\/title>/);
+  assert.match(html, /<title>mogugi‧魔古工坊<\/title>/);
   assert.ok(html.includes('<em-nav current="mogugi">'));
   const desc = '瑪奇台服的免費傷害統計工具。只在本機讀取封包，不修改遊戲、不送出任何封包，資料全部留在你的電腦。';
   assert.ok(html.includes(`<meta name="description" content="${desc}">`));
   assert.ok(html.includes(`<meta property="og:description" content="${desc}">`));
-  assert.ok(html.includes('<meta property="og:title" content="mogugi・魔古工坊">'));
+  assert.ok(html.includes('<meta property="og:title" content="mogugi‧魔古工坊">'));
   for (const text of [
     `<p class="lead">${desc}</p>`,
-    '<h2>免費使用・需加入 Discord 啟用</h2>',
-    'mogugi 完全免費，不收任何費用。第一次開啟時，需要用 Discord 帳號登入，並加入魔古工坊的 Discord 群組才能啟用。',
-    '啟用的效期是 30 天。到期後 mogugi 會請你再用 Discord 登入一次，登入後就能繼續使用，紀錄和設定都會保留；如果那時已經不在群組裡，就無法再啟用。',
-    '這樣做是為了避免有人把免費的工具拿去轉賣，也讓版本公告和問題回報集中在同一個地方，減少紛爭。',
-    '如果有人向你收費販售 mogugi，那不是我們提供的，請不要付款，並到 Discord 回報。',
+    '<p><b>免費軟體：</b>mogugi 為免費軟體，不收任何費用。如果有人向你收費販售 mogugi，那不是我們提供的，請不要付款，並到 Discord 回報。</p>',
+    '<p><b>OAuth 驗證：</b>第一次開啟會提示需要 Discord 驗證以啟用，需加入魔古工坊 Discord 群組以完成。啟用的效期是 30 天，到期後 mogugi 會請你再用 Discord 登入一次。</p>',
     '加入 Discord 群組',
     'https://npcap.com/#download',
     '下載上面的 exe 並執行。',
@@ -147,7 +144,7 @@ test('mogugi release page content is in the HTML', () => {
   assert.ok(!html.includes('data-shot'), 'no placeholder drawings left');
   assert.ok(!html.includes('shot-hero') && !html.includes('<figure'), 'no hero screenshot');
   assert.ok(!html.includes('能做什麼'));
-  const order = ['id="dl"', '<h2 class="section-title">目前功能</h2>', '免費使用・需加入 Discord 啟用', '開始使用', '更新紀錄'].map((t) => html.indexOf(t));
+  const order = ['id="dl"', '<h2 class="section-title">目前功能</h2>', '<b>免費軟體：</b>', '開始使用', '更新紀錄'].map((t) => html.indexOf(t));
   assert.ok(order.every((v, i) => v > 0 && (i === 0 || v > order[i - 1])), `section order ${order}`);
   const shots = [...html.matchAll(/<a class="zoom" href="([^"]+)"[^>]*>\s*<img src="([^"]+)"/g)];
   assert.equal(shots.length, 5, 'every feature screenshot opens full size');
@@ -175,12 +172,12 @@ test('home links the mogugi card to the release page and shows its version from 
 
 test('mabilat page content is in the HTML', () => {
   const html = pages.find((p) => p.path === '/mabilat/').html;
-  assert.match(html, /<title>mabilat 即時延遲・魔古工坊<\/title>/);
+  assert.match(html, /<title>mabilat 即時延遲‧魔古工坊<\/title>/);
   assert.ok(html.includes('<em-nav current="mabilat">'));
   assert.ok(html.includes('<main class="wide">'));
   for (const text of [
     'mabilat 即時延遲',
-    '瑪奇台服各頻道的網路品質估算。量測主機ISP為中華電信，物理位置在新竹。數據可能因電信業者以及地理位置有偏差，僅供參考。',
+    '瑪奇台服各頻道的網路品質估算。量測主機 ISP 為中華電信，物理位置在新竹。數據可能因電信業者以及地理位置有偏差，僅供參考。',
     '<h2>頻道</h2>', '每分鐘爆PING 次數', '每分鐘 p95', '表格檢視',
     '<link rel="stylesheet" href="/_shared/mabilat/mabilat.css">',
     '<script type="module" src="/_shared/mabilat/page.js"></script>',

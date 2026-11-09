@@ -82,7 +82,7 @@ const link = (href, text, cls) =>
 export function downloadHtml(r) {
   const date = taipeiDate(r.publishedAt);
   const head = `<div class="dl-head"><div><div class="eyebrow">最新版本</div><div class="ver">${escapeHtml(r.tag)}</div></div>`
-    + `<time datetime="${date}">${date} 發佈</time></div>`;
+    + `<time datetime="${date}">${date} 發布</time></div>`;
   const btns = [];
   if (r.exe) btns.push(link(r.exe.url, '下載 exe <small>直接執行</small>', 'btn primary'));
   if (r.zip) btns.push(link(r.zip.url, '下載 zip <small>壓縮檔</small>', btns.length ? 'btn' : 'btn primary'));
@@ -90,7 +90,7 @@ export function downloadHtml(r) {
     return `${head}<div class="dl-btns">${link(r.url, '到 GitHub 下載', 'btn primary')}</div>`;
   }
   return `${head}<div class="dl-btns">${btns.join('')}</div>`
-    + `<p class="dl-meta">下載走台灣有節點的鏡像。無法下載時，請改用 ${link(r.url, 'GitHub release')}，內容相同。</p>`;
+    + `<p class="dl-meta">下載連結為台灣節點，速度較快。若無法下載，請至 ${link(r.url, 'GitHub 發布頁')} 下載。</p>`;
 }
 
 export function changelogHtml(list, max = 8) {

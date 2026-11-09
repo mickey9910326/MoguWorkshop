@@ -16,9 +16,8 @@
   width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
   font-family: var(--font-num); font-weight: 700; font-size: 20px; color: var(--accent-ink); background: var(--gold);
 }
-.notice h2 { font-family: var(--font-display); font-weight: 400; font-size: 19px; margin-bottom: 6px; }
 .notice p { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
-.notice p.warn { color: var(--ink); border-left: 3px solid var(--gold); padding-left: 10px; }
+.notice p b { color: var(--ink); }
 .notice .btn { margin-top: 4px; }
 
 .steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px; }
