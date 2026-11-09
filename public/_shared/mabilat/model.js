@@ -119,26 +119,43 @@ export const isCurrentReply = (data, minutes) => data.minutes == null || data.mi
 const esc = escapeHtml;
 
 export const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
-export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP（DNS）' };
+export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP(DNS)' };
 export const CONTROL_SCORE_NOTE = 'ping 由路由器或伺服器的 CPU 回應，延遲比實際線路高，分數只能看趨勢，不能和頻道比。';
 
 // The API's control points; an older API without the field, or a bad value, gives none.
-// Every tile has a fixed set of lines (5 for a channel, 7 for a control point; a missing
-// deduction line is kept empty) so the CSS subgrid lines a row of tiles up line by line.
 export const controlTargets = (data) => (Array.isArray(data?.control) ? data.control : []);
+
+// One tile: name, score, a quiet bar of what the deductions took, then two rows
+// of small cells (latency p50/p95/p99, then min and peaks). Every tile has the same
+// 7 lines (an empty deduction row is kept) so the CSS subgrid lines a row of tiles
+// up line by line, channels and control points alike.
+const pct = (v) => +v.toFixed(1);
+function deductions(score, pp) {
+  if (!pp) return '<div class="dd"></div>';
+  const keep = Math.max(0, score?.value ?? 0);
+  const total = Math.max(100, keep + pp.hp + pp.sp);
+  const w = (v) => pct((100 * v) / total);
+  const text = `HP −${pp.hp.toFixed(1)} ‧ SP −${pp.sp.toFixed(1)}`;
+  return `<div class="dd" title="近 60 分鐘各部分扣的分數：HP −${pp.hp.toFixed(1)}、SP −${pp.sp.toFixed(1)}">`
+    + `<div class="bar"><i class="k" style="width:${w(keep)}%"></i><i class="hp" style="width:${w(pp.hp)}%"></i><i class="sp" style="width:${w(pp.sp)}%"></i></div>`
+    + `<div class="dd-l">${text}</div></div>`;
+}
+const cell = (label, value, hot = false) => `<div class="c${hot ? ' hot' : ''}"><span>${label}</span><b>${value}</b></div>`;
 
 export function tileHtml(c, rule, { control = false } = {}) {
   const l = scoreView(c.score), pp = scoreParts(c.score, rule);
   const name = control ? esc(c.channel) : `${esc(c.server)} ${esc(c.channel)}`;
-  const ip = control ? `\n      <div class="ln ip">${esc(c.ip)} ‧ ${METHOD_LABEL[c.method] || METHOD_LABEL.icmp}</div>` : '';
+  const hot = c.peaks > 0;
+  const method = control ? ` ‧ ${METHOD_LABEL[c.method] || METHOD_LABEL.icmp}` : '';
+  const ip = `\n      <div class="ln ip">${esc(c.ip)}${method}</div>`;
   const ref = control ? `<span class="ref" title="${esc(CONTROL_SCORE_NOTE)}">參考</span>` : '';
-  const min = control ? `\n      <div class="ln" title="最接近線路本身的延遲">最小 <b>${fmt(c.min)}</b><span class="lg"> ms</span></div>` : '';
   return `
     <div class="tile${control ? ' ctl' : ''} lvl-${l.cls}">
       <div class="top"><span class="name">${name}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>${ip}
       <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span>${ref}</div>
-      <div class="ln">p50 <b>${fmt(c.p50)}</b> ‧ p95 <b>${fmt(c.p95)}</b><span class="lg"> ms</span></div>${min}
-      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−${pp.hp.toFixed(1)}</b> ‧ SP<span class="lg"> 扣分</span> <b>−${pp.sp.toFixed(1)}</b></div>` : '<div class="ln"></div>'}
-      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg"> 率</span> <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks}<span class="lg"> </span>次）</div>
+      ${deductions(c.score, pp)}
+      <div class="unit">延遲 ms</div>
+      <div class="cells">${cell('p50', fmt(c.p50))}${cell('p95', fmt(c.p95))}${cell('p99', fmt(c.p99))}</div>
+      <div class="cells">${cell('最小', fmt(c.min))}${cell('爆PING', `${fmt(c.peak_permille, 2)}<small>‰</small>`, hot)}${cell('次數', String(c.peaks ?? 0), hot)}</div>
     </div>`;
 }

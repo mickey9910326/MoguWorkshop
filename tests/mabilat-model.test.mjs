@@ -157,46 +157,66 @@ test('controlTargets tolerates old and empty replies', () => {
   assert.equal(controlTargets({ control: [{ channel: 'a' }] }).length, 1);
 });
 
-test('channel tile markup is unchanged by the move', () => {
-  const expected = `
-    <div class="tile lvl-normal">
-      <div class="top"><span class="name">娜歐 CH1</span></div>
-      <div class="score" title="近 60 分鐘分數"><span class="v">92.3</span><span class="lv">普通</span></div>
-      <div class="ln">p50 <b>3.01</b> ‧ p95 <b>5.43</b><span class="lg"> ms</span></div>
-      <div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−13.3</b> ‧ SP<span class="lg"> 扣分</span> <b>−0.0</b></div>
-      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg"> 率</span> <b>0.42</b>‰（3<span class="lg"> </span>次）</div>
-    </div>`;
-  assert.equal(tileHtml(TILE_CH, TILE_RULE), expected);
-  assert.match(tileHtml({ ...TILE_CH, status: 'timeout' }, TILE_RULE), /<span class="status timeout"><i><\/i>逾時<\/span>/);
+// 分數 = 100 − HP − SP（API 的算法），扣分條三段加起來剛好 100
+const TILE_CH2 = { ...TILE_CH, p99: 8.46, min: 2.32, score: { value: 86.7, level: 'normal', d: 220, s: 0, n: 5400 } };
+const lineCount = (h) => (h.match(/\n {6}<div/g) || []).length;
+
+test('channel tile: score, a quiet deduction bar, then two rows of cells', () => {
+  const h = tileHtml(TILE_CH2, TILE_RULE);
+  assert.equal(lineCount(h), 7);
+  assert.match(h, /<div class="tile lvl-normal">/);
+  assert.match(h, /<span class="name">娜歐 CH1<\/span>/);
+  assert.match(h, /<div class="ln ip">210\.208\.80\.31<\/div>/);   // 頻道只顯示 IP，不標量法
+  assert.match(h, /<span class="v">86\.7<\/span><span class="lv">普通<\/span>/);
+  assert.match(h, /<div class="unit">延遲 ms<\/div>/);
+  for (const [label, v] of [['p50', '3.01'], ['p95', '5.43'], ['p99', '8.46'], ['最小', '2.32']]) {
+    assert.match(h, new RegExp(`<div class="c"><span>${label}</span><b>${v.replace('.', '\.')}</b></div>`), label);
+  }
+  assert.match(h, /<div class="c hot"><span>爆PING<\/span><b>0\.42<small>‰<\/small><\/b><\/div>/);
+  assert.match(h, /<div class="c hot"><span>次數<\/span><b>3<\/b><\/div>/);
+  assert.match(h, /<div class="dd" title="近 60 分鐘各部分扣的分數：HP −13\.3、SP −0\.0">/);
+  assert.match(h, /<div class="dd-l">HP −13\.3 ‧ SP −0\.0<\/div>/);
+  assert.match(h, /<i class="k" style="width:86\.7%"><\/i><i class="hp" style="width:13\.3%"><\/i>/);
+  assert.match(tileHtml({ ...TILE_CH2, status: 'timeout' }, TILE_RULE), /<span class="status timeout"><i><\/i>逾時<\/span>/);
   assert.equal(STATUS_TEXT.down, '中斷');
 });
 
+test('no peaks means no red, and no score keeps an empty deduction row', () => {
+  const calm = tileHtml({ ...TILE_CH2, peaks: 0, peak_permille: 0 }, TILE_RULE);
+  assert.doesNotMatch(calm, /hot/);
+  const na = tileHtml({ ...TILE_CH2, score: { value: null, level: 'na', n: 0, d: 0, s: 0 } }, TILE_RULE);
+  assert.equal(lineCount(na), 7);
+  assert.match(na, /<div class="dd"><\/div>/);
+  const empty = tileHtml({ ...TILE_CH2, p50: null, p95: null, p99: null, min: null, peaks: 0, peak_permille: null }, TILE_RULE);
+  assert.match(empty, /<span>p99<\/span><b>–<\/b>/);
+  assert.match(empty, /<span>爆PING<\/span><b>–<small>‰<\/small><\/b>/);
+});
+
+test('deduction bar never overflows when the deductions pass 100', () => {
+  const h = tileHtml({ ...TILE_CH2, score: { value: 0, level: 'bad', d: 2200, s: 50000, n: 7200 } }, TILE_RULE);
+  const widths = [...h.matchAll(/width:([\d.]+)%/g)].map((m) => +m[1]);
+  assert.ok(widths.reduce((a, b) => a + b, 0) <= 100.05, widths.join(','));
+});
+
 test('control tile shows ip, method, min and the reference mark', () => {
-  const h = tileHtml({ ...TILE_CH, server: '對照組', channel: 'HiNet DNS', ip: '168.95.1.1', method: 'dns', min: 1.84 },
+  const h = tileHtml({ ...TILE_CH2, server: '對照組', channel: 'HiNet DNS', ip: '168.95.1.1', method: 'dns', min: 1.84 },
     TILE_RULE, { control: true });
+  assert.equal(lineCount(h), 7);
+  assert.match(h, /<div class="tile ctl lvl-normal">/);
   assert.match(h, /<span class="name">HiNet DNS<\/span>/);
   assert.doesNotMatch(h, /對照組/);
-  assert.match(h, /<div class="ln ip">168\.95\.1\.1 ‧ TCP（DNS）<\/div>/);
-  assert.match(h, /最小 <b>1\.84<\/b>/);
+  assert.match(h, /<div class="ln ip">168\.95\.1\.1 ‧ TCP\(DNS\)<\/div>/);
+  assert.match(h, /<span>最小<\/span><b>1\.84<\/b>/);
   assert.match(h, /<span class="ref" title="[^"]+">參考<\/span>/);
   assert.ok(h.includes(CONTROL_SCORE_NOTE));
   const icmp = tileHtml({ ...TILE_CH, channel: 'local節點1', ip: '192.168.0.1', method: 'icmp' }, TILE_RULE, { control: true });
   assert.match(icmp, /192\.168\.0\.1 ‧ ICMP/);
   const unknown = tileHtml({ ...TILE_CH, channel: 'x', ip: '1.1.1.1' }, TILE_RULE, { control: true });
   assert.match(unknown, /1\.1\.1\.1 ‧ ICMP/);
-  assert.deepEqual(METHOD_LABEL, { icmp: 'ICMP', dns: 'TCP（DNS）' });
+  assert.deepEqual(METHOD_LABEL, { icmp: 'ICMP', dns: 'TCP(DNS)' });
 });
 
 test('control tile escapes names', () => {
   assert.match(tileHtml({ ...TILE_CH, channel: '<x>', ip: '1.1.1.1' }, TILE_RULE, { control: true }), /&lt;x&gt;/);
 });
 
-test('tiles keep a fixed number of lines so a row lines up', () => {
-  const lines = (h) => (h.match(/<div class="(?:top|score|ln[^"]*)"/g) || []).length;
-  const na = { ...TILE_CH, score: { value: null, level: 'na', n: 0, d: 0, s: 0 } };
-  assert.equal(lines(tileHtml(TILE_CH, TILE_RULE)), 5);
-  assert.equal(lines(tileHtml(na, TILE_RULE)), 5); // 沒有扣分時留一個空行
-  assert.equal(lines(tileHtml(TILE_CH, TILE_RULE, { control: true })), 7);
-  assert.equal(lines(tileHtml(na, TILE_RULE, { control: true })), 7);
-  assert.match(tileHtml(TILE_CH, TILE_RULE, { control: true }), /<div class="tile ctl lvl-normal">/);
-});
