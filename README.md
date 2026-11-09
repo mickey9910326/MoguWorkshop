@@ -10,4 +10,5 @@
 
 - 每頁 `<head>` 載入 `https://umami.elden-mogu.com/mw.js`，`data-domains` 只算正式網域，本機開發不計。追蹤 script 與上傳端點（`/api/mw`）改過名，避開擋廣告外掛對 umami 預設路徑的封鎖。
 - Discord 連結各有 `data-umami-event`：導覽列一律 `discord-nav`（`page` 屬性記點擊的頁面），其餘為 `discord-home`、`discord-doll`、`discord-mogugi`、`discord-mogugi-report`、`discord-mogugi-oauth`、`discord-mogugi-steps`。
+- mogugi 下載連結（由 `releases.js` 動態產生）：`download-exe`、`download-zip`，屬性 `version` 為版本、`place` 為 `main`（上方大按鈕）或 `changelog`（更新紀錄）。GitHub 連結不追蹤。
 - 新增頁面或 Discord 連結時，`tests/site.test.mjs` 會檢查有沒有漏掉 script 或事件名稱。

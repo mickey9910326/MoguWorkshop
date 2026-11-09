@@ -76,16 +76,20 @@ export function renderNotes(md) {
   return out.join('');
 }
 
-const link = (href, text, cls) =>
-  `<a${cls ? ` class="${cls}"` : ''} href="${escapeHtml(href)}" rel="noopener">${text}</a>`;
+const link = (href, text, cls, extra = '') =>
+  `<a${cls ? ` class="${cls}"` : ''} href="${escapeHtml(href)}" rel="noopener"${extra}>${text}</a>`;
+
+// Umami counts downloads as download-exe / download-zip; version and place (main buttons or changelog) are properties.
+const track = (kind, r, place) =>
+  ` data-umami-event="download-${kind}" data-umami-event-version="${escapeHtml(r.tag)}" data-umami-event-place="${place}"`;
 
 export function downloadHtml(r) {
   const date = taipeiDate(r.publishedAt);
   const head = `<div class="dl-head"><div><div class="eyebrow">最新版本</div><div class="ver">${escapeHtml(r.tag)}</div></div>`
     + `<time datetime="${date}">${date} 發布</time></div>`;
   const btns = [];
-  if (r.exe) btns.push(link(r.exe.url, '下載 exe <small>直接執行</small>', 'btn primary'));
-  if (r.zip) btns.push(link(r.zip.url, '下載 zip <small>壓縮檔</small>', btns.length ? 'btn' : 'btn primary'));
+  if (r.exe) btns.push(link(r.exe.url, '下載 exe <small>直接執行</small>', 'btn primary', track('exe', r, 'main')));
+  if (r.zip) btns.push(link(r.zip.url, '下載 zip <small>壓縮檔</small>', btns.length ? 'btn' : 'btn primary', track('zip', r, 'main')));
   if (!btns.length) {
     return `${head}<div class="dl-btns">${link(r.url, '到 GitHub 下載', 'btn primary')}</div>`;
   }
@@ -96,8 +100,8 @@ export function downloadHtml(r) {
 export function changelogHtml(list, max = 8) {
   const items = list.slice(0, max).map((r, i) => {
     const links = [];
-    if (r.exe) links.push(link(r.exe.url, 'exe'));
-    if (r.zip) links.push(link(r.zip.url, 'zip'));
+    if (r.exe) links.push(link(r.exe.url, 'exe', '', track('exe', r, 'changelog')));
+    if (r.zip) links.push(link(r.zip.url, 'zip', '', track('zip', r, 'changelog')));
     links.push(link(r.url, 'GitHub'));
     return `<details class="rel"${i === 0 ? ' open' : ''}><summary><b>${escapeHtml(r.tag)}</b>`
       + `<span>${taipeiDate(r.publishedAt)}</span></summary><div class="rel-body">${renderNotes(r.body)}`

@@ -127,3 +127,32 @@ test('loadReleases returns null on any failure', async () => {
   assert.equal(await loadReleases(async () => ({ ok: true, json: async () => { throw new SyntaxError('x'); } })), null);
   assert.equal(await loadReleases(async () => ({ ok: true, json: async () => ({ releases: [] }) })), null);
 });
+
+const anchors = (html) => [...html.matchAll(/<a [^>]*>/g)].map((m) => m[0]);
+const tagged = (html, ev) => anchors(html).filter((a) => a.includes(` data-umami-event="${ev}"`));
+
+test('downloadHtml buttons are tracked as download-exe / download-zip with version and place', () => {
+  const html = downloadHtml(rel('v0.6.1'));
+  for (const [ev, file] of [['download-exe', 'mogugi_0.6.1.exe'], ['download-zip', 'mogugi_0.6.1.zip']]) {
+    const a = tagged(html, ev);
+    assert.equal(a.length, 1, ev);
+    assert.ok(a[0].includes(file), a[0]);
+    assert.match(a[0], / data-umami-event-version="v0\.6\.1"/);
+    assert.match(a[0], / data-umami-event-place="main"/);
+  }
+  assert.equal(anchors(html).filter((a) => a.includes('data-umami-event')).length, 2, 'GitHub link not tracked');
+});
+
+test('changelogHtml exe/zip links are tracked per version with place=changelog', () => {
+  const html = changelogHtml([rel('v0.6.1'), rel('v0.6.0'), rel('v0.5.4', { r2: false })]);
+  for (const ev of ['download-exe', 'download-zip']) {
+    const a = tagged(html, ev);
+    assert.deepEqual(a.map((x) => / data-umami-event-version="([^"]+)"/.exec(x)[1]), ['v0.6.1', 'v0.6.0'], ev);
+    for (const x of a) assert.match(x, / data-umami-event-place="changelog"/);
+  }
+});
+
+test('tracking attributes escape the tag', () => {
+  const html = downloadHtml(rel('v1"><x'));
+  assert.ok(!html.includes('"><x'), html);
+});
