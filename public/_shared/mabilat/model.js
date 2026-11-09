@@ -122,15 +122,15 @@ const esc = escapeHtml;
 
 export const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
 export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP(DNS)' };
-export const CONTROL_SCORE_NOTE = '路由器用 CPU 回應 ping、DNS 伺服器要處理查詢，延遲比實際線路高，分數只能看趨勢，不能和頻道比。';
+export const CONTROL_SCORE_NOTE = '路由器用 CPU 回應 ping、DNS 伺服器要處理查詢，延遲比實際線路高，數字只能看趨勢，不能和頻道比。';
 
 // The API's control points; an older API without the field, or a bad value, gives none.
 export const controlTargets = (data) => (Array.isArray(data?.control) ? data.control : []);
 
 // One tile: name, score, a quiet bar of what the deductions took, then two rows
 // of small cells (latency p50/p95/p99, then min and peaks). Every tile has the same
-// 7 lines (an empty deduction row is kept) so the CSS subgrid lines a row of tiles
-// up line by line, channels and control points alike.
+// lines (7 for a channel, keeping an empty deduction row; 6 for a control point, which
+// has no score) so the CSS subgrid lines each card's row of tiles up line by line.
 const pct = (v) => +v.toFixed(1);
 function deductions(score, pp) {
   if (!pp) return '<div class="dd"></div>';
@@ -150,12 +150,15 @@ export function tileHtml(c, rule, { control = false } = {}) {
   const hot = c.peaks > 0;
   const method = control ? ` ‧ ${METHOD_LABEL[c.method] || METHOD_LABEL.icmp}` : '';
   const ip = `\n      <div class="ln ip">${esc(c.ip)}${method}</div>`;
-  const ref = control ? `<span class="ref" title="${esc(CONTROL_SCORE_NOTE)}">參考</span>` : '';
+  // Control points show no score, level or deduction bar (the API still sends them); only the 參考 mark stays.
+  const head = control
+    ? `<div class="score"><span class="ref" title="${esc(CONTROL_SCORE_NOTE)}">參考</span></div>`
+    : `<div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span></div>
+      ${deductions(c.score, pp)}`;
   return `
-    <div class="tile${control ? ' ctl' : ''} lvl-${l.cls}">
+    <div class="tile${control ? ' ctl' : ` lvl-${l.cls}`}">
       <div class="top"><span class="name">${name}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>${ip}
-      <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span>${ref}</div>
-      ${deductions(c.score, pp)}
+      ${head}
       <div class="unit">延遲 ms</div>
       <div class="cells">${cell('p50', fmt(c.p50))}${cell('p95', fmt(c.p95))}${cell('p99', fmt(c.p99))}</div>
       <div class="cells">${cell('最小', fmt(c.min))}${cell('爆PING', `${fmt(c.peak_permille, 2)}<small>‰</small>`, hot)}${cell('次數', String(c.peaks ?? 0), hot)}</div>

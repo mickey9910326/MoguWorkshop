@@ -265,5 +265,6 @@ test('mabilat page has the control card and split sampling notes', () => {
   assert.ok(!html.includes('取樣方式</h3>'), 'old headings gone');
   for (const ip of ['192.168.0.1', '168.95.98.254', '210.242.214.241', '168.95.1.1', '1.1.1.1']) assert.ok(html.includes(ip), ip);
   assert.ok(html.includes('最小：') && html.includes('p99'), 'min and p99 explained');
+  assert.ok(!html.includes('分數用和頻道同一套公式'), 'control has no score any more');
   assert.ok(!html.includes('機房') && !html.includes('防火牆'), 'no DC or firewall wording');
 });

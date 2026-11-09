@@ -201,8 +201,12 @@ test('deduction bar never overflows when the deductions pass 100', () => {
 test('control tile shows ip, method, min and the reference mark', () => {
   const h = tileHtml({ ...TILE_CH2, server: '對照組', channel: 'HiNet DNS', ip: '168.95.1.1', method: 'dns', min: 1.84 },
     TILE_RULE, { control: true });
-  assert.equal(lineCount(h), 7);
-  assert.match(h, /<div class="tile ctl lvl-normal">/);
+  // 對照組不顯示分數、等級與扣分條（只留「參考」），小卡也不依等級上色；少了扣分那一行，共 6 行
+  assert.equal(lineCount(h), 6);
+  assert.match(h, /<div class="tile ctl">/);
+  assert.doesNotMatch(h, /lvl-|class="v"|class="lv"|class="dd"|HP −/);
+  assert.match(h, /<div class="score"><span class="ref" title="[^"]+">參考<\/span><\/div>/);
+  assert.doesNotMatch(CONTROL_SCORE_NOTE, /分數/);
   assert.match(h, /<span class="name">HiNet DNS<\/span>/);
   assert.doesNotMatch(h, /對照組/);
   assert.match(h, /<div class="ln ip">168\.95\.1\.1 ‧ TCP\(DNS\)<\/div>/);
