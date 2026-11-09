@@ -74,6 +74,8 @@ export function scoreExplain(rule) {
     `換算：一次 ≥ ${cap} ms 的爆PING 約扣 ${((cap - st) / k).toFixed(1)} 分，一次 30 ms 約扣 ${((30 - st) / k).toFixed(1)} 分；` +
       `約 5.8 ms 的 SlowPing 佔一成時約扣 ${((full * 0.1 * (5.8 - sl)) / k2).toFixed(1)} 分。`,
     `等級：${levels}。`,
+    `HP、SP 扣分：小卡分數下方的細條與數字。HP 是 HighPing 扣掉的分數、SP 是 SlowPing 扣掉的分數，都已換算成 ${w} 分鐘滿額；` +
+      '細條由左到右是剩下的分數、HP 扣分、SP 扣分，三段合起來是 100 分（扣分超過 100 時按比例縮短）。',
     `近 ${w} 分鐘成功的 PING 少於 ${min.toLocaleString('en-US')} 次時不給分（顯示「樣本不足」）。`,
   ];
 }

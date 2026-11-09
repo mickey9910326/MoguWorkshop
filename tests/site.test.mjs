@@ -261,7 +261,9 @@ test('mabilat page has the control card and split sampling notes', () => {
   assert.ok(html.includes('id="control-card"') && html.includes('id="control-tiles"'), 'control card');
   assert.ok(html.indexOf('id="tiles"') < html.indexOf('id="control-card"'), 'after the channel tiles');
   assert.ok(html.indexOf('id="control-card"') < html.indexOf('id="heat-score"'), 'before the score heatmap');
-  assert.ok(html.includes('<h3>頻道取樣方式</h3>') && html.includes('<h3>對照組取樣方式</h3>'), 'two sampling sections');
-  assert.ok(!html.includes('<h3>取樣方式</h3>'), 'old heading gone');
+  assert.ok(html.includes('<h3>遊戲頻道測量方式</h3>') && html.includes('<h3>對照組測量方式</h3>'), 'two sampling sections');
+  assert.ok(!html.includes('取樣方式</h3>'), 'old headings gone');
+  for (const ip of ['192.168.0.1', '168.95.98.254', '210.242.214.241', '168.95.1.1', '1.1.1.1']) assert.ok(html.includes(ip), ip);
+  assert.ok(html.includes('最小：') && html.includes('p99'), 'min and p99 explained');
   assert.ok(!html.includes('機房') && !html.includes('防火牆'), 'no DC or firewall wording');
 });
