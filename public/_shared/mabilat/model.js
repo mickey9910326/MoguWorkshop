@@ -1,7 +1,9 @@
 // mabilat's display rules, kept identical to the original page so the
 // numbers and colours mean the same thing after the move.
 
-export { escapeHtml } from '../mogugi/releases.js';
+import { escapeHtml } from '../mogugi/releases.js';
+
+export { escapeHtml };
 
 // Peak level by peaks per 1000 successful pings, independent of window size
 // and ping interval.
@@ -112,3 +114,29 @@ export const overviewUrl = (minutes) => `api/overview?minutes=${clampMinutes(min
 // A slow reply for a window the user has already left must not be drawn.
 // The loading reply carries no minutes and always counts.
 export const isCurrentReply = (data, minutes) => data.minutes == null || data.minutes === minutes;
+
+// ---- Tiles: one card per channel or control point ----
+const esc = escapeHtml;
+
+export const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
+export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP（DNS 查詢）' };
+export const CONTROL_SCORE_NOTE = 'ping 由路由器或伺服器的 CPU 回應，延遲比實際線路高，分數只能看趨勢，不能和頻道比。';
+
+// The API's control points; an older API without the field, or a bad value, gives none.
+export const controlTargets = (data) => (Array.isArray(data?.control) ? data.control : []);
+
+export function tileHtml(c, rule, { control = false } = {}) {
+  const l = scoreView(c.score), pp = scoreParts(c.score, rule);
+  const name = control ? esc(c.channel) : `${esc(c.server)} ${esc(c.channel)}`;
+  const ip = control ? `\n      <div class="ln ip">${esc(c.ip)} ‧ ${METHOD_LABEL[c.method] || METHOD_LABEL.icmp}</div>` : '';
+  const ref = control ? `<span class="ref" title="${esc(CONTROL_SCORE_NOTE)}">參考</span>` : '';
+  const min = control ? `\n      <div class="ln" title="最接近線路本身的延遲">最小 <b>${fmt(c.min)}</b><span class="lg"> ms</span></div>` : '';
+  return `
+    <div class="tile lvl-${l.cls}">
+      <div class="top"><span class="name">${name}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>${ip}
+      <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span>${ref}</div>
+      <div class="ln">p50 <b>${fmt(c.p50)}</b> ‧ p95 <b>${fmt(c.p95)}</b><span class="lg"> ms</span></div>${min}
+      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−${pp.hp.toFixed(1)}</b> ‧ SP<span class="lg"> 扣分</span> <b>−${pp.sp.toFixed(1)}</b></div>` : ''}
+      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg"> 率</span> <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks}<span class="lg"> </span>次）</div>
+    </div>`;
+}

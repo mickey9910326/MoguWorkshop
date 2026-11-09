@@ -141,3 +141,52 @@ test('scoreLevelOf maps a value to the API rule levels', () => {
   assert.equal(scoreLevelOf(null, rule), 'na');
   assert.equal(scoreLevelOf(90, null), 'na');
 });
+
+// ---- 小卡（頻道與對照組共用） ----
+import { tileHtml, controlTargets, CONTROL_SCORE_NOTE, METHOD_LABEL, STATUS_TEXT } from '../public/_shared/mabilat/model.js';
+
+const TILE_RULE = { window_min: 60, k: 22, k2: 500 };
+const TILE_CH = { server: '娜歐', channel: 'CH1', ip: '210.208.80.31', status: 'up', p50: 3.01, p95: 5.43, min: 2.4,
+  peaks: 3, peak_permille: 0.42, score: { value: 92.34, level: 'normal', d: 220, s: 0, n: 5400 } };
+
+test('controlTargets tolerates old and empty replies', () => {
+  assert.deepEqual(controlTargets({ channels: [] }), []);
+  assert.deepEqual(controlTargets({ control: [] }), []);
+  assert.deepEqual(controlTargets(null), []);
+  assert.deepEqual(controlTargets({ control: 'x' }), []);
+  assert.equal(controlTargets({ control: [{ channel: 'a' }] }).length, 1);
+});
+
+test('channel tile markup is unchanged by the move', () => {
+  const expected = `
+    <div class="tile lvl-normal">
+      <div class="top"><span class="name">娜歐 CH1</span></div>
+      <div class="score" title="近 60 分鐘分數"><span class="v">92.3</span><span class="lv">普通</span></div>
+      <div class="ln">p50 <b>3.01</b> ‧ p95 <b>5.43</b><span class="lg"> ms</span></div>
+      <div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−13.3</b> ‧ SP<span class="lg"> 扣分</span> <b>−0.0</b></div>
+      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg"> 率</span> <b>0.42</b>‰（3<span class="lg"> </span>次）</div>
+    </div>`;
+  assert.equal(tileHtml(TILE_CH, TILE_RULE), expected);
+  assert.match(tileHtml({ ...TILE_CH, status: 'timeout' }, TILE_RULE), /<span class="status timeout"><i><\/i>逾時<\/span>/);
+  assert.equal(STATUS_TEXT.down, '中斷');
+});
+
+test('control tile shows ip, method, min and the reference mark', () => {
+  const h = tileHtml({ ...TILE_CH, server: '對照組', channel: 'HiNet DNS', ip: '168.95.1.1', method: 'dns', min: 1.84 },
+    TILE_RULE, { control: true });
+  assert.match(h, /<span class="name">HiNet DNS<\/span>/);
+  assert.doesNotMatch(h, /對照組/);
+  assert.match(h, /<div class="ln ip">168\.95\.1\.1 ‧ TCP（DNS 查詢）<\/div>/);
+  assert.match(h, /最小 <b>1\.84<\/b>/);
+  assert.match(h, /<span class="ref" title="[^"]+">參考<\/span>/);
+  assert.ok(h.includes(CONTROL_SCORE_NOTE));
+  const icmp = tileHtml({ ...TILE_CH, channel: 'local節點1', ip: '192.168.0.1', method: 'icmp' }, TILE_RULE, { control: true });
+  assert.match(icmp, /192\.168\.0\.1 ‧ ICMP/);
+  const unknown = tileHtml({ ...TILE_CH, channel: 'x', ip: '1.1.1.1' }, TILE_RULE, { control: true });
+  assert.match(unknown, /1\.1\.1\.1 ‧ ICMP/);
+  assert.deepEqual(METHOD_LABEL, { icmp: 'ICMP', dns: 'TCP（DNS 查詢）' });
+});
+
+test('control tile escapes names', () => {
+  assert.match(tileHtml({ ...TILE_CH, channel: '<x>', ip: '1.1.1.1' }, TILE_RULE, { control: true }), /&lt;x&gt;/);
+});

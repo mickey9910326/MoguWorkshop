@@ -1,6 +1,7 @@
 import {
   LEVEL_RANGES, P95_LABELS, cellPermille, permilleLevel, pkLabels, pkIndex, p95Index,
   fmt, winLabel, overviewUrl, escapeHtml, isCurrentReply, scoreView, scoreLegend, scoreExplain, scoreParts, overviewRows, SCORE_LABEL, SCORE_CLS, scoreLevelOf,
+  tileHtml, controlTargets, STATUS_TEXT,
 } from './model.js';
 
 // Live latency page for mabilat. Data comes from the same-origin, relative
@@ -9,7 +10,6 @@ const POLL_MS = 5000;
 const SERVERS = ['總覽', '娜歐', '貝婷', '愛麗沙', '全部'];
 const NAMES = ['娜歐', '貝婷', '愛麗沙'];
 const WINDOWS = [15, 30, 60, 1440];
-const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
 const pkVar = (n, bucket) => `var(--pk-${pkIndex(n, bucket)})`;
 // 近一天每格 5～10 分鐘，改用爆PING 機率（‰）依等級由綠到紅；一小時以內每格樣本太少，維持次數
 const dayMode = () => bucketOf() > 60;
@@ -163,17 +163,7 @@ function renderTiles(chs) {
   $('tiles').className = ov ? 'ov-wrap' : 'tiles';
   if (ov) { renderOverview(chs); return; }
   const rule = state.data && state.data.score_rule;
-  $('tiles').innerHTML = chs.map(c => {
-    const l = scoreView(c.score), pp = scoreParts(c.score, rule);
-    return `
-    <div class="tile lvl-${l.cls}">
-      <div class="top"><span class="name">${esc(c.server)} ${esc(c.channel)}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>
-      <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span></div>
-      <div class="ln">p50 <b>${fmt(c.p50)}</b> ‧ p95 <b>${fmt(c.p95)}</b><span class="lg"> ms</span></div>
-      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−${pp.hp.toFixed(1)}</b> ‧ SP<span class="lg"> 扣分</span> <b>−${pp.sp.toFixed(1)}</b></div>` : ''}
-      <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg"> 率</span> <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks}<span class="lg"> </span>次）</div>
-    </div>`;
-  }).join('') || `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;
+  $('tiles').innerHTML = chs.map(c => tileHtml(c, rule)).join('') || `<div class="empty">${loading() ? '載入中…' : '沒有資料'}</div>`;
 }
 
 function renderTable(chs) {
