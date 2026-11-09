@@ -138,6 +138,9 @@ details.note ul { margin: 6px 0 0; padding-left: 18px; }
 .tile .ln { font-size: 11.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; line-height: 1.55; }
 .tile .ln b { color: var(--text-primary); font-weight: 600; }
 /* IP 與量法要完整看得到：寬度不夠就換行，不截斷（手機上 .tile .ln 的省略規則也不套用） */
+/* 同一排小卡逐行對齊：每張小卡佔 5 列（對照組 7 列），列高由整排共用（subgrid），換行的那一行會把整排一起撐高 */
+.tiles > .tile { display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; align-content: start; }
+.tiles > .tile.ctl { grid-row: span 7; }
 .tile .ln.ip { color: var(--text-muted); white-space: normal; overflow: visible; overflow-wrap: anywhere; }
 .tile .score .ref { align-self: center; font-size: 11px; line-height: 1.5; padding: 0 6px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-muted); cursor: help; }
 

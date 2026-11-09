@@ -176,7 +176,7 @@ test('control tile shows ip, method, min and the reference mark', () => {
     TILE_RULE, { control: true });
   assert.match(h, /<span class="name">HiNet DNS<\/span>/);
   assert.doesNotMatch(h, /對照組/);
-  assert.match(h, /<div class="ln ip">168\.95\.1\.1 ‧ TCP（DNS 查詢）<\/div>/);
+  assert.match(h, /<div class="ln ip">168\.95\.1\.1 ‧ TCP（DNS）<\/div>/);
   assert.match(h, /最小 <b>1\.84<\/b>/);
   assert.match(h, /<span class="ref" title="[^"]+">參考<\/span>/);
   assert.ok(h.includes(CONTROL_SCORE_NOTE));
@@ -184,9 +184,19 @@ test('control tile shows ip, method, min and the reference mark', () => {
   assert.match(icmp, /192\.168\.0\.1 ‧ ICMP/);
   const unknown = tileHtml({ ...TILE_CH, channel: 'x', ip: '1.1.1.1' }, TILE_RULE, { control: true });
   assert.match(unknown, /1\.1\.1\.1 ‧ ICMP/);
-  assert.deepEqual(METHOD_LABEL, { icmp: 'ICMP', dns: 'TCP（DNS 查詢）' });
+  assert.deepEqual(METHOD_LABEL, { icmp: 'ICMP', dns: 'TCP（DNS）' });
 });
 
 test('control tile escapes names', () => {
   assert.match(tileHtml({ ...TILE_CH, channel: '<x>', ip: '1.1.1.1' }, TILE_RULE, { control: true }), /&lt;x&gt;/);
+});
+
+test('tiles keep a fixed number of lines so a row lines up', () => {
+  const lines = (h) => (h.match(/<div class="(?:top|score|ln[^"]*)"/g) || []).length;
+  const na = { ...TILE_CH, score: { value: null, level: 'na', n: 0, d: 0, s: 0 } };
+  assert.equal(lines(tileHtml(TILE_CH, TILE_RULE)), 5);
+  assert.equal(lines(tileHtml(na, TILE_RULE)), 5); // 沒有扣分時留一個空行
+  assert.equal(lines(tileHtml(TILE_CH, TILE_RULE, { control: true })), 7);
+  assert.equal(lines(tileHtml(na, TILE_RULE, { control: true })), 7);
+  assert.match(tileHtml(TILE_CH, TILE_RULE, { control: true }), /<div class="tile ctl lvl-normal">/);
 });

@@ -119,10 +119,12 @@ export const isCurrentReply = (data, minutes) => data.minutes == null || data.mi
 const esc = escapeHtml;
 
 export const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
-export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP（DNS 查詢）' };
+export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP（DNS）' };
 export const CONTROL_SCORE_NOTE = 'ping 由路由器或伺服器的 CPU 回應，延遲比實際線路高，分數只能看趨勢，不能和頻道比。';
 
 // The API's control points; an older API without the field, or a bad value, gives none.
+// Every tile has a fixed set of lines (5 for a channel, 7 for a control point; a missing
+// deduction line is kept empty) so the CSS subgrid lines a row of tiles up line by line.
 export const controlTargets = (data) => (Array.isArray(data?.control) ? data.control : []);
 
 export function tileHtml(c, rule, { control = false } = {}) {
@@ -132,11 +134,11 @@ export function tileHtml(c, rule, { control = false } = {}) {
   const ref = control ? `<span class="ref" title="${esc(CONTROL_SCORE_NOTE)}">參考</span>` : '';
   const min = control ? `\n      <div class="ln" title="最接近線路本身的延遲">最小 <b>${fmt(c.min)}</b><span class="lg"> ms</span></div>` : '';
   return `
-    <div class="tile lvl-${l.cls}">
+    <div class="tile${control ? ' ctl' : ''} lvl-${l.cls}">
       <div class="top"><span class="name">${name}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>${ip}
       <div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span>${ref}</div>
       <div class="ln">p50 <b>${fmt(c.p50)}</b> ‧ p95 <b>${fmt(c.p95)}</b><span class="lg"> ms</span></div>${min}
-      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−${pp.hp.toFixed(1)}</b> ‧ SP<span class="lg"> 扣分</span> <b>−${pp.sp.toFixed(1)}</b></div>` : ''}
+      ${pp ? `<div class="ln" title="近 60 分鐘各部分扣的分數">HP<span class="lg"> 扣分</span> <b>−${pp.hp.toFixed(1)}</b> ‧ SP<span class="lg"> 扣分</span> <b>−${pp.sp.toFixed(1)}</b></div>` : '<div class="ln"></div>'}
       <div class="ln" title="每 1000 次 PING 中延遲 ≥ 100 ms 的次數">爆PING<span class="lg"> 率</span> <b>${fmt(c.peak_permille, 2)}</b>‰（${c.peaks}<span class="lg"> </span>次）</div>
     </div>`;
 }
