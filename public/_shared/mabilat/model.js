@@ -121,7 +121,7 @@ export const isCurrentReply = (data, minutes) => data.minutes == null || data.mi
 const esc = escapeHtml;
 
 export const STATUS_TEXT = { up: '連線中', timeout: '逾時', down: '中斷' };
-export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP(DNS)' };
+export const METHOD_LABEL = { icmp: 'ICMP', dns: 'TCP(DNS)', ttl: 'TCP(TTL)' };
 export const CONTROL_SCORE_NOTE = '路由器用 CPU 回應 ping、DNS 伺服器要處理查詢，延遲比實際線路高，數字只能看趨勢，不能和頻道比。';
 
 // The API's control points; an older API without the field, or a bad value, gives none.

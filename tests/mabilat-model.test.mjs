@@ -217,7 +217,8 @@ test('control tile shows ip, method, min and the reference mark', () => {
   assert.match(icmp, /192\.168\.0\.1 ‧ ICMP/);
   const unknown = tileHtml({ ...TILE_CH, channel: 'x', ip: '1.1.1.1' }, TILE_RULE, { control: true });
   assert.match(unknown, /1\.1\.1\.1 ‧ ICMP/);
-  assert.deepEqual(METHOD_LABEL, { icmp: 'ICMP', dns: 'TCP(DNS)' });
+  assert.deepEqual(METHOD_LABEL, { icmp: 'ICMP', dns: 'TCP(DNS)', ttl: 'TCP(TTL)' });
+  assert.match(tileHtml({ ...TILE_CH, channel: '是方節點', ip: '150.116.62.94', method: 'ttl' }, TILE_RULE, { control: true }), /150\.116\.62\.94 ‧ TCP\(TTL\)/);
 });
 
 test('control tile escapes names', () => {
