@@ -225,3 +225,67 @@ test('control tile escapes names', () => {
   assert.match(tileHtml({ ...TILE_CH, channel: '<x>', ip: '1.1.1.1' }, TILE_RULE, { control: true }), /&lt;x&gt;/);
 });
 
+
+// ---- 近 10 分鐘數值（第二份 API 回應）與小卡的 10 分／60 分／兩者 ----
+import { STAT_MODES, HEAT_WINDOWS, HEAT_METRICS, recentTitle } from '../public/_shared/mabilat/model.js';
+
+const RECENT = { ...TILE_CH2, p50: 2.71, p95: 3.28, p99: 3.7, min: 2.17, peaks: 0, peak_permille: 0,
+  score: { value: 10, level: 'bad', d: 9999, s: 0, n: 1200 } };
+
+test('stat modes, heat windows and heat metrics', () => {
+  assert.deepEqual(STAT_MODES.map((m) => [m.v, m.l]), [['10', '10 分'], ['60', '60 分'], ['both', '兩者']]);
+  assert.deepEqual(HEAT_WINDOWS.map((w) => [w.v, w.l, !!w.off]), [[60, '近 1 小時', false], [1440, '近一天', false], [10080, '近一週', true]]);
+  assert.deepEqual(HEAT_METRICS.map((m) => [m.v, m.l]), [['score', '分數'], ['peaks', '爆PING'], ['p95', 'p95']]);
+});
+
+test('stat 60 (default) is the stock tile', () => {
+  assert.equal(tileHtml(TILE_CH2, TILE_RULE, { stat: '60', recent: RECENT }), tileHtml(TILE_CH2, TILE_RULE));
+});
+
+test('stat 10 shows the recent numbers but keeps the 60-minute score', () => {
+  const h = tileHtml(TILE_CH2, TILE_RULE, { stat: '10', recent: RECENT });
+  assert.equal(lineCount(h), 7);
+  assert.match(h, /<span class="v">86\.7<\/span><span class="lv">普通<\/span>/);
+  assert.match(h, /HP −13\.3/);
+  assert.match(h, /<div class="unit">延遲 ms（近 10 分鐘）<\/div>/);
+  assert.match(h, /<span>p99<\/span><b>3\.70<\/b>/);
+  assert.match(h, /<span>次數<\/span><b>0<\/b>/);
+  assert.doesNotMatch(h, /hot/);
+});
+
+test('stat 10 without a recent reply falls back to the 60-minute numbers', () => {
+  const h = tileHtml(TILE_CH2, TILE_RULE, { stat: '10', recent: null });
+  assert.match(h, /<span>p99<\/span><b>8\.46<\/b>/);
+  assert.match(h, /<div class="unit">延遲 ms<\/div>/);
+});
+
+test('stat both: one table with 近 10 分 and 近 60 分 columns', () => {
+  const h = tileHtml(TILE_CH2, TILE_RULE, { stat: 'both', recent: RECENT });
+  assert.match(h, /<div class="tile both lvl-normal">/);
+  assert.equal((h.match(/\n {6}<(div|table)/g) || []).length, 5, 'top, ip, score, deductions, table');
+  assert.match(h, /<th>ms<\/th><th>近 10 分<\/th><th>近 60 分<\/th>/);
+  assert.match(h, /<tr><th>p50<\/th><td>2\.71<\/td><td>3\.01<\/td><\/tr>/);
+  assert.match(h, /<tr><th>p99<\/th><td>3\.70<\/td><td>8\.46<\/td><\/tr>/);
+  assert.match(h, /<tr><th>最小<\/th><td>2\.17<\/td><td>2\.32<\/td><\/tr>/);
+  assert.match(h, /<tr><th>爆PING<\/th><td>0<\/td><td class="hot">3<\/td><\/tr>/);
+  const none = tileHtml(TILE_CH2, TILE_RULE, { stat: 'both', recent: null });
+  assert.match(none, /<tr><th>p50<\/th><td>–<\/td><td>3\.01<\/td><\/tr>/);
+  assert.match(none, /<tr><th>爆PING<\/th><td>–<\/td>/);
+});
+
+test('control tiles ignore the stat mode', () => {
+  const c = { ...TILE_CH2, channel: 'HiNet DNS', ip: '168.95.1.1', method: 'dns' };
+  assert.equal(tileHtml(c, TILE_RULE, { control: true, stat: 'both', recent: RECENT }), tileHtml(c, TILE_RULE, { control: true }));
+});
+
+test('recentTitle: the overview hover text', () => {
+  assert.equal(recentTitle(RECENT), '近 10 分鐘 p50 2.71／p95 3.28／p99 3.70 ms，爆PING 0 次');
+  assert.equal(recentTitle(null), '');
+});
+
+test('scoreExplain no longer points at a time-window picker', () => {
+  const text = scoreExplain({ window_min: 60, start_ms: 6, cap_ms: 100, slow_ms: 4.3, k: 22, k2: 500, min_samples: 5400, levels: [] }).join(' ');
+  assert.doesNotMatch(text, /上方選的時間範圍/);
+  assert.match(text, /只看近 60 分鐘，每 5 秒更新/);
+});
+

@@ -66,7 +66,7 @@ export function scoreExplain(rule) {
   const full = w * 120;
   const levels = scoreLegend(rule).map((l) => `${l.label} ${l.range}`).join('、');
   return [
-    `只看近 ${w} 分鐘，與上方選的時間範圍無關，每 5 秒更新。`,
+    `只看近 ${w} 分鐘，每 5 秒更新。`,
     `HighPing：每次 PING 超過 ${st} ms 的部分加總，超過 ${cap} ms 的以 ${cap} ms 計。`,
     `SlowPing：每次 PING 落在 ${sl}–${st} ms 時，超出 ${sl} ms 的部分加總。`,
     `分數 = 100 − (HighPing ÷ ${k} + SlowPing ÷ ${k2}) × ${full.toLocaleString('en-US')} ÷ PING 次數，最低 0 分；` +
@@ -144,10 +144,36 @@ function deductions(score, pp) {
 }
 const cell = (label, value, hot = false) => `<div class="c${hot ? ' hot' : ''}"><span>${label}</span><b>${value}</b></div>`;
 
-export function tileHtml(c, rule, { control = false } = {}) {
+// Tile numbers: '60' (default) the 60-minute reply, '10' the recent (10-minute) reply,
+// 'both' a two-column table. The score and deduction bar always stay on 60 minutes.
+export const STAT_MODES = [{ v: '10', l: '10 分' }, { v: '60', l: '60 分' }, { v: 'both', l: '兩者' }];
+export const RECENT_MIN = 10;
+// The heatmap's own window and metric; 近一週 waits for the SQLite hourly table.
+export const HEAT_WINDOWS = [{ v: 60, l: '近 1 小時' }, { v: 1440, l: '近一天' }, { v: 10080, l: '近一週', off: true }];
+export const HEAT_METRICS = [{ v: 'score', l: '分數' }, { v: 'peaks', l: '爆PING' }, { v: 'p95', l: 'p95' }];
+
+// Overview hover text for one channel's recent reply.
+export const recentTitle = (x) => (x ? `近 ${RECENT_MIN} 分鐘 p50 ${fmt(x.p50)}／p95 ${fmt(x.p95)}／p99 ${fmt(x.p99)} ms，爆PING ${x.peaks} 次` : '');
+
+const statTable = (c, x) => {
+  const y = x || {};
+  const td = (v, hot = false) => `<td${hot ? ' class="hot"' : ''}>${v}</td>`;
+  const row = (k, a, b) => `<tr><th>${k}</th>${a}${b}</tr>`;
+  return `<table class="mini"><thead><tr><th>ms</th><th>近 ${RECENT_MIN} 分</th><th>近 60 分</th></tr></thead><tbody>` +
+    row('p50', td(fmt(y.p50)), td(fmt(c.p50))) + row('p95', td(fmt(y.p95)), td(fmt(c.p95))) +
+    row('p99', td(fmt(y.p99)), td(fmt(c.p99))) + row('最小', td(fmt(y.min)), td(fmt(c.min))) +
+    row('爆PING', td(x ? String(y.peaks ?? 0) : '–', y.peaks > 0), td(String(c.peaks ?? 0), c.peaks > 0)) +
+    '</tbody></table>';
+};
+
+export function tileHtml(c, rule, { control = false, stat = '60', recent = null } = {}) {
+  if (control) stat = '60';
+  const both = stat === 'both';
+  const num = stat === '10' && recent ? recent : c;
+  const unit = num === c ? '延遲 ms' : `延遲 ms（近 ${RECENT_MIN} 分鐘）`;
   const l = scoreView(c.score), pp = scoreParts(c.score, rule);
   const name = control ? esc(c.channel) : `${esc(c.server)} ${esc(c.channel)}`;
-  const hot = c.peaks > 0;
+  const hot = num.peaks > 0;
   const method = control ? ` ‧ ${METHOD_LABEL[c.method] || METHOD_LABEL.icmp}` : '';
   const ip = `\n      <div class="ln ip">${esc(c.ip)}${method}</div>`;
   // Control points show no score, level or deduction bar (the API still sends them); only the 參考 mark stays.
@@ -156,11 +182,11 @@ export function tileHtml(c, rule, { control = false } = {}) {
     : `<div class="score" title="近 60 分鐘分數"><span class="v">${l.text}</span><span class="lv">${esc(l.label)}</span></div>
       ${deductions(c.score, pp)}`;
   return `
-    <div class="tile${control ? ' ctl' : ` lvl-${l.cls}`}">
+    <div class="tile${control ? ' ctl' : `${both ? ' both' : ''} lvl-${l.cls}`}">
       <div class="top"><span class="name">${name}</span>${c.status === 'up' ? '' : `<span class="status ${c.status}"><i></i>${STATUS_TEXT[c.status]}</span>`}</div>${ip}
       ${head}
-      <div class="unit">延遲 ms</div>
-      <div class="cells">${cell('p50', fmt(c.p50))}${cell('p95', fmt(c.p95))}${cell('p99', fmt(c.p99))}</div>
-      <div class="cells">${cell('最小', fmt(c.min))}${cell('爆PING', `${fmt(c.peak_permille, 2)}<small>‰</small>`, hot)}${cell('次數', String(c.peaks ?? 0), hot)}</div>
+      ${both ? statTable(c, recent) : `<div class="unit">${unit}</div>
+      <div class="cells">${cell('p50', fmt(num.p50))}${cell('p95', fmt(num.p95))}${cell('p99', fmt(num.p99))}</div>
+      <div class="cells">${cell('最小', fmt(num.min))}${cell('爆PING', `${fmt(num.peak_permille, 2)}<small>‰</small>`, hot)}${cell('次數', String(num.peaks ?? 0), hot)}</div>`}
     </div>`;
 }

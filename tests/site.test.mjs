@@ -178,7 +178,7 @@ test('mabilat page content is in the HTML', () => {
   for (const text of [
     'mabilat 即時延遲',
     '瑪奇台服各頻道的網路品質估算。量測主機 ISP 為中華電信，物理位置在新竹。數據可能因電信業者以及地理位置有偏差，僅供參考。',
-    '<h2>頻道</h2>', '每分鐘爆PING 次數', '每分鐘 p95', '表格檢視',
+    '<h2>頻道分數</h2>', '<h2 id="heat-title">分數熱度圖</h2>', '表格檢視',
     '<link rel="stylesheet" href="/_shared/mabilat/mabilat.css">',
     '<script type="module" src="/_shared/mabilat/page.js"></script>',
   ]) assert.ok(html.includes(text), `mabilat: ${text}`);
@@ -186,10 +186,23 @@ test('mabilat page content is in the HTML', () => {
   assert.doesNotMatch(html, /各指標仍在測試中|大字是近 60 分鐘的分數/);
   assert.match(html, /<\/header>\s*<div class="notice" role="note">[\s\S]*?修正 11\/09~10 主機資源不夠量測失真問題/);
   assert.doesNotMatch(html, /<span class="badge">測試中<\/span>/);
-  assert.match(html, /id="heat-score"/);
-  for (const h of ['分數熱度圖', '每分鐘爆PING 次數', '每分鐘 p95', '取樣與分數說明']) {
+  // 頻道分數與熱度圖預設展開；表格、對照組、說明預設收起
+  for (const h of ['頻道分數', '分數熱度圖']) {
+    assert.match(html, new RegExp(String.raw`<details class="fold" open>\s*<summary><h2[^>]*>${h}`), `${h} starts open`);
+  }
+  for (const h of ['表格檢視', '對照組', '取樣與分數說明']) {
     assert.match(html, new RegExp(String.raw`<details class="fold">\s*<summary><h2[^>]*>${h}`), `${h} starts folded`);
   }
+  // 一張熱度圖，指標與時間範圍在它的標題列；數值切換在頻道分數的標題列；最上面只剩伺服器
+  for (const id of ['heat-score', 'heat95', 'legend-score', 'legend95', 'p95-title', 'heat-unit']) assert.doesNotMatch(html, new RegExp(`id="${id}"`), id);
+  const summaryOf = (title) => html.slice(html.indexOf(title), html.indexOf('</summary>', html.indexOf(title)));
+  assert.ok(summaryOf('分數熱度圖</h2>').includes('id="f-metric"') && summaryOf('分數熱度圖</h2>').includes('id="f-window"'), 'heatmap controls in its title row');
+  assert.ok(summaryOf('頻道分數</h2>').includes('id="f-stat"') && summaryOf('頻道分數</h2>').includes('id="stat-ctl"'), 'stat toggle in the score title row');
+  const filters = html.slice(html.indexOf('<div class="filters">'), html.indexOf('<section'));
+  assert.ok(filters.includes('id="f-server"') && !filters.includes('id="f-window"'), 'top filters: server only');
+  assert.ok(html.indexOf('id="tiles"') < html.indexOf('id="heat"') && html.indexOf('id="heat"') < html.indexOf('id="table"') &&
+    html.indexOf('id="table"') < html.indexOf('id="control-card"') && html.indexOf('id="control-card"') < html.indexOf('id="about"'), 'card order');
+  assert.doesNotMatch(html, /上方所選時間範圍/);
   assert.ok(html.includes('取樣與分數說明'));
   assert.match(html, /id="score-explain"/);
   assert.ok(html.includes('每 0.5 秒'));
@@ -260,8 +273,7 @@ test('dev proxy notes say to start a local mabilat with the /mabilat base path',
 test('mabilat page has the control card and split sampling notes', () => {
   const html = pages.find((p) => p.path === '/mabilat/').html;
   assert.ok(html.includes('id="control-card"') && html.includes('id="control-tiles"'), 'control card');
-  assert.ok(html.indexOf('id="tiles"') < html.indexOf('id="control-card"'), 'after the channel tiles');
-  assert.ok(html.indexOf('id="control-card"') < html.indexOf('id="heat-score"'), 'before the score heatmap');
+  assert.ok(html.indexOf('id="table"') < html.indexOf('id="control-card"'), 'below the table');
   assert.ok(html.includes('<h3>遊戲頻道測量方式</h3>') && html.includes('<h3>對照組測量方式</h3>'), 'two sampling sections');
   assert.ok(!html.includes('取樣方式</h3>'), 'old headings gone');
   for (const ip of ['192.168.0.1', '168.95.98.254', '210.242.214.241', '150.116.62.94', '210.208.88.73', '210.208.88.77', '112.121.93.113', '112.121.93.117', '210.208.87.70', '168.95.1.1', '1.1.1.1']) assert.ok(html.includes(ip), ip);
