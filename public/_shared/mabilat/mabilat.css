@@ -35,7 +35,7 @@
   --select-ring: var(--series-1);
 }
 
-main.wide { --main-max: 1200px; gap: 16px; font-size: 14px; line-height: 1.45; }
+main.wide { max-width: 1200px; gap: 16px; font-size: 14px; line-height: 1.45; }
 main.wide > * { min-width: 0; }
 .ml-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
 .ml-head h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(24px, 5vw, 32px); display: flex; align-items: center; gap: 8px; }

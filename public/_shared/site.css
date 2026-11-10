@@ -79,8 +79,7 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding-top: 
    The grid only applies once nav.js has run (html.mw-nav-ready), so pages read fine without JS.
    The column keeps its full width when the rail collapses (--rail-space), so the page never shifts;
    only the rail itself narrows (--rail). */
-:root { --rail: 208px; --rail-space: 0px; --main-max: 840px; }
-:root.mw-nav-ready { --rail-space: 208px; }
+:root { --rail: 208px; --rail-space: 208px; }
 :root.mw-collapsed { --rail: 60px; }
 em-nav { display: contents; }
 .mw-nav-ready body { display: grid; grid-template-columns: var(--rail-space) minmax(0, 1fr); }
@@ -133,7 +132,6 @@ button.item { font: inherit; background: none; cursor: pointer; text-align: left
 
 .fab, .sheet, .scrim { display: none; }
 @media (max-width: 639px) {
-  :root.mw-nav-ready { --rail-space: 0px; }
   .mw-nav-ready body { grid-template-columns: minmax(0, 1fr); }
   .rail { display: none; }
   .fab {
@@ -165,10 +163,7 @@ button.item { font: inherit; background: none; cursor: pointer; text-align: left
 }
 
 main {
-  /* centered on the window rather than the column right of the rail: shift left by half the rail, never past the column edge */
-  width: 100%; max-width: var(--main-max); margin: 0 auto;
-  margin-left: max(0px, calc((100% - var(--main-max)) / 2 - var(--rail-space) / 2));
-  display: grid; gap: 28px; align-content: start;
+  width: 100%; max-width: 840px; margin: 0 auto; display: grid; gap: 28px; align-content: start;
   padding: 32px calc(20px + env(safe-area-inset-right)) 0 calc(20px + env(safe-area-inset-left));
   padding-bottom: calc(104px + env(safe-area-inset-bottom));
 }
