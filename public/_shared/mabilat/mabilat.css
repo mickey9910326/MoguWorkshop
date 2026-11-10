@@ -164,9 +164,10 @@ details.note ul { margin: 6px 0 0; padding-left: 18px; }
 .tile .c.hot b { color: var(--critical); }
 .tile .score .ref { align-self: center; font-size: 11px; line-height: 1.5; padding: 0 6px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-muted); cursor: help; }
 
-/* overview: channel × server table, the score as a small tinted chip */
-table.ov { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
-table.ov th, table.ov td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: left; white-space: nowrap; }
+/* overview: channel × server table, the score as a small tinted chip.
+   Sized to its content (like the phone layout) instead of stretching the three columns across a wide screen. */
+main.wide table.ov { border-collapse: collapse; width: auto; font-variant-numeric: tabular-nums; }
+table.ov th, table.ov td { padding: 5px 14px 5px 10px; border-bottom: 1px solid var(--grid); text-align: left; white-space: nowrap; }
 table.ov th { color: var(--text-secondary); font-weight: 600; font-size: 13px; }
 table.ov td.ch { color: var(--text-secondary); font-weight: 600; width: 72px; }
 .chip { --lv: var(--text-muted); display: inline-flex; align-items: baseline; gap: 6px; padding: 1px 10px 1px 8px; border-radius: 999px;

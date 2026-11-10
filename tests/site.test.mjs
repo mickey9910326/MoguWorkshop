@@ -295,3 +295,11 @@ test('every Discord link in the HTML has its own Umami event name', () => {
     'discord-mogugi-oauth', 'discord-mogugi-report', 'discord-mogugi-steps',
   ]);
 });
+
+test('collapsing the rail keeps the page column fixed; only the rail itself narrows', () => {
+  assert.match(rule('.mw-nav-ready body'), /grid-template-columns:\s*var\(--rail-space\) minmax\(0, 1fr\)/);
+  assert.match(CSS, /:root \{[^}]*--rail-space:\s*208px/);
+  assert.doesNotMatch(CSS, /\.mw-collapsed[^{]*\{[^}]*--rail-space/, 'collapsed must not change the column');
+  assert.match(CSS, /:root\.mw-collapsed \{[^}]*--rail:\s*60px/);
+  assert.match(rule('.rail'), /width:\s*var\(--rail\)/);
+});
