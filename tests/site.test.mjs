@@ -296,10 +296,9 @@ test('every Discord link in the HTML has its own Umami event name', () => {
   ]);
 });
 
-test('collapsing the rail keeps the page column fixed; only the rail itself narrows', () => {
-  assert.match(rule('.mw-nav-ready body'), /grid-template-columns:\s*var\(--rail-space\) minmax\(0, 1fr\)/);
-  assert.match(CSS, /:root \{[^}]*--rail-space:\s*208px/);
-  assert.doesNotMatch(CSS, /\.mw-collapsed[^{]*\{[^}]*--rail-space/, 'collapsed must not change the column');
-  assert.match(CSS, /:root\.mw-collapsed \{[^}]*--rail:\s*60px/);
-  assert.match(rule('.rail'), /width:\s*var\(--rail\)/);
+test('collapsing the rail gives its space to the page', () => {
+  assert.match(rule('.mw-nav-ready body'), /grid-template-columns:\s*var\(--rail\) minmax\(0, 1fr\)/);
+  assert.match(CSS, /:root \{ --rail: 208px; \}/);
+  assert.match(CSS, /:root\.mw-collapsed \{ --rail: 60px; \}/);
+  assert.doesNotMatch(CSS, /--rail-space/, 'no separate reserved column');
 });

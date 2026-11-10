@@ -77,15 +77,14 @@ footer { color: var(--muted); font-size: 13px; text-align: center; padding-top: 
 /* ---------- navigation: <em-nav> ----------
    em-nav uses display: contents so its rail becomes the first column of the body grid.
    The grid only applies once nav.js has run (html.mw-nav-ready), so pages read fine without JS.
-   The column keeps its full width when the rail collapses (--rail-space), so the page never shifts;
-   only the rail itself narrows (--rail). */
-:root { --rail: 208px; --rail-space: 208px; }
+   Collapsing the rail narrows the column too, giving the space to the page. */
+:root { --rail: 208px; }
 :root.mw-collapsed { --rail: 60px; }
 em-nav { display: contents; }
-.mw-nav-ready body { display: grid; grid-template-columns: var(--rail-space) minmax(0, 1fr); }
+.mw-nav-ready body { display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); }
 
 .rail {
-  position: sticky; top: 0; height: 100vh; height: 100dvh; z-index: 10; width: var(--rail);
+  position: sticky; top: 0; height: 100vh; height: 100dvh; z-index: 10;
   background: var(--surface);
   border-right: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 4px; padding: 14px 10px; overflow: hidden;
