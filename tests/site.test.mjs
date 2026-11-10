@@ -298,8 +298,16 @@ test('every Discord link in the HTML has its own Umami event name', () => {
 
 test('collapsing the rail keeps the page column fixed; only the rail itself narrows', () => {
   assert.match(rule('.mw-nav-ready body'), /grid-template-columns:\s*var\(--rail-space\) minmax\(0, 1fr\)/);
-  assert.match(CSS, /:root \{[^}]*--rail-space:\s*208px/);
+  assert.match(CSS, /:root\.mw-nav-ready \{[^}]*--rail-space:\s*208px/, 'rail space only once the rail exists');
   assert.doesNotMatch(CSS, /\.mw-collapsed[^{]*\{[^}]*--rail-space/, 'collapsed must not change the column');
   assert.match(CSS, /:root\.mw-collapsed \{[^}]*--rail:\s*60px/);
   assert.match(rule('.rail'), /width:\s*var\(--rail\)/);
+});
+
+test('main is centered on the window, not on the column right of the rail', () => {
+  // the column starts after --rail-space, so shift left by half of it; never past the column's edge
+  assert.match(rule('main'), /max-width:\s*var\(--main-max\)/);
+  assert.match(rule('main'), /margin-left:\s*max\(0px, calc\(\(100% - var\(--main-max\)\) \/ 2 - var\(--rail-space\) \/ 2\)\)/);
+  assert.match(CSS, /:root \{[^}]*--main-max:\s*840px/);
+  assert.match(CSS, /@media \(max-width: 639px\) \{[\s\S]*?:root\.mw-nav-ready \{ --rail-space: 0px; \}/, 'no rail on phones');
 });
