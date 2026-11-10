@@ -183,7 +183,8 @@ test('mabilat page content is in the HTML', () => {
     '<script type="module" src="/_shared/mabilat/page.js"></script>',
   ]) assert.ok(html.includes(text), `mabilat: ${text}`);
   assert.doesNotMatch(html, /id="score-summary"|近 60 分鐘分數/);
-  assert.doesNotMatch(html, /各指標仍在測試中|class="notice"|大字是近 60 分鐘的分數/);
+  assert.doesNotMatch(html, /各指標仍在測試中|大字是近 60 分鐘的分數/);
+  assert.match(html, /<\/header>\s*<div class="notice" role="note">[\s\S]*?修正 11\/09~10 主機資源不夠量測失真問題/);
   assert.doesNotMatch(html, /<span class="badge">測試中<\/span>/);
   assert.match(html, /id="heat-score"/);
   for (const h of ['分數熱度圖', '每分鐘爆PING 次數', '每分鐘 p95', '取樣與分數說明']) {
