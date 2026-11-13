@@ -184,7 +184,7 @@ test('mabilat page content is in the HTML', () => {
   ]) assert.ok(html.includes(text), `mabilat: ${text}`);
   assert.doesNotMatch(html, /id="score-summary"|近 60 分鐘分數/);
   assert.doesNotMatch(html, /各指標仍在測試中|大字是近 60 分鐘的分數/);
-  assert.match(html, /<\/header>\s*<div class="notice" role="note">[\s\S]*?修正 11\/09~10 主機資源不夠量測失真問題/);
+  assert.match(html, /<\/header>\s*<div class="notice" role="note">[\s\S]*?11\/13 18:00~20:00 準備去當流亡者/);
   assert.doesNotMatch(html, /<span class="badge">測試中<\/span>/);
   // 頻道分數與熱度圖預設展開；表格、對照組、說明預設收起
   for (const h of ['頻道分數', '分數熱度圖']) {
