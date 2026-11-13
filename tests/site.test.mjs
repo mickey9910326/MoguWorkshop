@@ -265,9 +265,10 @@ test('the hidden attribute wins over component display rules', () => {
   assert.match(CSS, /\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}/);
 });
 
-test('dev proxy notes say to start a local mabilat with the /mabilat base path', () => {
+test('dev proxy notes match the /api/mabilat/ path, which needs no --base-path', () => {
   const src = readFileSync(join(ROOT, 'tools', 'dev-server.mjs'), 'utf8');
-  assert.match(src, /--base-path \/mabilat/);
+  assert.match(src, /\/api\/mabilat\/\* to MABILAT_API/);
+  assert.doesNotMatch(src, /--base-path/);
 });
 
 test('mabilat page has the control card and split sampling notes', () => {

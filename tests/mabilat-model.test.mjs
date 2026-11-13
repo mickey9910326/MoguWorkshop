@@ -46,8 +46,8 @@ test('window labels and the overview url', () => {
   assert.equal(clampMinutes(0), 1);
   assert.equal(clampMinutes(99999), 1440);
   assert.equal(clampMinutes('abc'), 60);
-  assert.equal(overviewUrl(30), 'api/overview?minutes=30');
-  assert.equal(overviewUrl(5000), 'api/overview?minutes=1440');
+  assert.equal(overviewUrl(30), '/api/mabilat/overview?minutes=30');
+  assert.equal(overviewUrl(5000), '/api/mabilat/overview?minutes=1440');
 });
 
 test('escapeHtml covers attribute quotes', () => {

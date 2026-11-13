@@ -1,8 +1,8 @@
 // Local preview: serves public/ like the Worker does and forwards
-// /mabilat/api/* to MABILAT_API (default: the live site, read-only).
+// /api/mabilat/* to MABILAT_API (default: the live site, read-only).
 //   npm run dev:proxy                       -> http://localhost:8788/
 //   MABILAT_API=http://localhost:8765 npm run dev:proxy
-//     (start that mabilat with: python -m mabilat serve --port 8765 --base-path /mabilat)
+//     (start that mabilat with: python -m mabilat serve --port 8765)
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, posix } from 'node:path';
@@ -16,7 +16,7 @@ const TYPES = {
 
 export function route(url) {
   const [path, query = ''] = url.split('?');
-  if (path.startsWith('/mabilat/api/')) return { proxy: url };
+  if (path.startsWith('/api/mabilat/')) return { proxy: url };
   let p;
   try { p = decodeURIComponent(path); } catch { return {}; }
   if (p.includes('\\') || p.split('/').includes('..')) return {};

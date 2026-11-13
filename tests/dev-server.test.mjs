@@ -2,8 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { route } from '../tools/dev-server.mjs';
 
-test('only /mabilat/api/ is proxied', () => {
-  assert.deepEqual(route('/mabilat/api/overview?minutes=15'), { proxy: '/mabilat/api/overview?minutes=15' });
+test('only /api/mabilat/ is proxied', () => {
+  assert.deepEqual(route('/api/mabilat/overview?minutes=15'), { proxy: '/api/mabilat/overview?minutes=15' });
+  assert.equal(route('/mabilat/api/overview').proxy, undefined);
+  assert.equal(route('/api/mushsoup/auth/me').proxy, undefined);
   assert.deepEqual(route('/mabilat/'), { file: 'mabilat/index.html' });
   assert.deepEqual(route('/mabilat'), { redirect: '/mabilat/' });
   assert.deepEqual(route('/_shared/site.css'), { file: '_shared/site.css' });

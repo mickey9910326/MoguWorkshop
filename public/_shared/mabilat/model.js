@@ -111,7 +111,7 @@ export function clampMinutes(v) {
   return Math.min(1440, Math.max(1, Math.round(n)));
 }
 
-export const overviewUrl = (minutes) => `api/overview?minutes=${clampMinutes(minutes)}`;
+export const overviewUrl = (minutes) => `/api/mabilat/overview?minutes=${clampMinutes(minutes)}`;
 
 // A slow reply for a window the user has already left must not be drawn.
 // The loading reply carries no minutes and always counts.

@@ -4,8 +4,8 @@ import {
   tileHtml, controlTargets, STATUS_TEXT, STAT_MODES, RECENT_MIN, HEAT_WINDOWS, HEAT_METRICS, recentTitle,
 } from './model.js';
 
-// Live latency page for mabilat. Data comes from the same-origin, relative
-// api/overview (proxied to mabilat through the tunnel); nothing else is sent.
+// Live latency page for mabilat. Data comes from the same-origin
+// /api/mabilat/overview (tunnel to mabilat-web); nothing else is sent.
 // Scores, tiles and the table always use the last 60 minutes; tiles can also
 // show the last 10. The heatmap picks its own window and metric.
 const POLL_MS = 5000;
