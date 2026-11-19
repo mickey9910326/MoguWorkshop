@@ -184,7 +184,13 @@ test('mabilat page content is in the HTML', () => {
   ]) assert.ok(html.includes(text), `mabilat: ${text}`);
   assert.doesNotMatch(html, /id="score-summary"|近 60 分鐘分數/);
   assert.doesNotMatch(html, /各指標仍在測試中|大字是近 60 分鐘的分數/);
-  assert.match(html, /<\/header>\s*<div class="notice" role="note">[\s\S]*?11\/13 18:00~20:00 準備去當流亡者/);
+  // 目前沒有公告：標題下面不放 notice
+  assert.doesNotMatch(html, /<div class="notice"/);
+  // 公告記錄：預設收起，最新在上，舊公告都留著
+  assert.match(html, /<section class="card" id="notice-log">\s*<details class="fold">\s*<summary><h2>公告記錄<\/h2>/);
+  const log = html.slice(html.indexOf('id="notice-log"'), html.indexOf('</section>', html.indexOf('id="notice-log"')));
+  const order = ['11/15：', '11/13 18:00~20:00 準備去當流亡者', '修正 11/09~10 主機資源不夠量測失真問題'].map((x) => log.indexOf(x));
+  assert.ok(order.every((i) => i >= 0) && order[0] < order[1] && order[1] < order[2], 'notice log newest first');
   assert.doesNotMatch(html, /<span class="badge">測試中<\/span>/);
   // 頻道分數與熱度圖預設展開；表格、對照組、說明預設收起
   for (const h of ['頻道分數', '分數熱度圖']) {
