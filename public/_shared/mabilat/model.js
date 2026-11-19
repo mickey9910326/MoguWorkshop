@@ -66,7 +66,7 @@ export function scoreExplain(rule) {
   const full = w * 120;
   const levels = scoreLegend(rule).map((l) => `${l.label} ${l.range}`).join('、');
   return [
-    `只看近 ${w} 分鐘，每 5 秒更新。`,
+    `只看近 ${w} 分鐘，每分鐘更新。`,
     `HighPing：每次 PING 超過 ${st} ms 的部分加總，超過 ${cap} ms 的以 ${cap} ms 計。`,
     `SlowPing：每次 PING 落在 ${sl}–${st} ms 時，超出 ${sl} ms 的部分加總。`,
     `分數 = 100 − (HighPing ÷ ${k} + SlowPing ÷ ${k2}) × ${full.toLocaleString('en-US')} ÷ PING 次數，最低 0 分；` +
@@ -103,12 +103,12 @@ export function p95Index(v) {
 
 export const fmt = (v, d = 2) => (v == null ? '–' : v.toFixed(d));
 
-export const winLabel = (v) => (v >= 1440 ? '近一天' : `近 ${v} 分鐘`);
+export const winLabel = (v) => (v >= 10080 ? '近一週' : v >= 1440 ? '近一天' : `近 ${v} 分鐘`);
 
 export function clampMinutes(v) {
   const n = Number(v);
   if (!Number.isFinite(n)) return 60;
-  return Math.min(1440, Math.max(1, Math.round(n)));
+  return Math.min(10080, Math.max(1, Math.round(n)));
 }
 
 export const overviewUrl = (minutes) => `/api/mabilat/overview?minutes=${clampMinutes(minutes)}`;
@@ -148,8 +148,8 @@ const cell = (label, value, hot = false) => `<div class="c${hot ? ' hot' : ''}">
 // 'both' a two-column table. The score and deduction bar always stay on 60 minutes.
 export const STAT_MODES = [{ v: '10', l: '10 分' }, { v: '60', l: '60 分' }, { v: 'both', l: '兩者' }];
 export const RECENT_MIN = 10;
-// The heatmap's own window and metric; 近一週 waits for the SQLite hourly table.
-export const HEAT_WINDOWS = [{ v: 60, l: '近 1 小時' }, { v: 1440, l: '近一天' }, { v: 10080, l: '近一週', off: true }];
+// The heatmap's own window and metric; 近一週 comes from mabilat's hourly table, one cell per hour.
+export const HEAT_WINDOWS = [{ v: 60, l: '近 1 小時' }, { v: 1440, l: '近一天' }, { v: 10080, l: '近一週' }];
 export const HEAT_METRICS = [{ v: 'score', l: '分數' }, { v: 'peaks', l: '爆PING' }, { v: 'p95', l: 'p95' }];
 
 // Overview hover text for one channel's recent reply.

@@ -43,11 +43,13 @@ test('fmt shows a dash for missing values', () => {
 test('window labels and the overview url', () => {
   assert.equal(winLabel(15), '近 15 分鐘');
   assert.equal(winLabel(1440), '近一天');
+  assert.equal(winLabel(10080), '近一週');
   assert.equal(clampMinutes(0), 1);
-  assert.equal(clampMinutes(99999), 1440);
+  assert.equal(clampMinutes(99999), 10080);
   assert.equal(clampMinutes('abc'), 60);
   assert.equal(overviewUrl(30), '/api/mabilat/overview?minutes=30');
-  assert.equal(overviewUrl(5000), '/api/mabilat/overview?minutes=1440');
+  assert.equal(overviewUrl(5000), '/api/mabilat/overview?minutes=5000');
+  assert.equal(overviewUrl(99999), '/api/mabilat/overview?minutes=10080');
 });
 
 test('escapeHtml covers attribute quotes', () => {
@@ -234,7 +236,7 @@ const RECENT = { ...TILE_CH2, p50: 2.71, p95: 3.28, p99: 3.7, min: 2.17, peaks: 
 
 test('stat modes, heat windows and heat metrics', () => {
   assert.deepEqual(STAT_MODES.map((m) => [m.v, m.l]), [['10', '10 分'], ['60', '60 分'], ['both', '兩者']]);
-  assert.deepEqual(HEAT_WINDOWS.map((w) => [w.v, w.l, !!w.off]), [[60, '近 1 小時', false], [1440, '近一天', false], [10080, '近一週', true]]);
+  assert.deepEqual(HEAT_WINDOWS.map((w) => [w.v, w.l, !!w.off]), [[60, '近 1 小時', false], [1440, '近一天', false], [10080, '近一週', false]]);
   assert.deepEqual(HEAT_METRICS.map((m) => [m.v, m.l]), [['score', '分數'], ['peaks', '爆PING'], ['p95', 'p95']]);
 });
 
@@ -286,6 +288,6 @@ test('recentTitle: the overview hover text', () => {
 test('scoreExplain no longer points at a time-window picker', () => {
   const text = scoreExplain({ window_min: 60, start_ms: 6, cap_ms: 100, slow_ms: 4.3, k: 22, k2: 500, min_samples: 5400, levels: [] }).join(' ');
   assert.doesNotMatch(text, /上方選的時間範圍/);
-  assert.match(text, /只看近 60 分鐘，每 5 秒更新/);
+  assert.match(text, /只看近 60 分鐘，每分鐘更新/);
 });
 

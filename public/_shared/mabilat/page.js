@@ -8,8 +8,9 @@ import {
 // /api/mabilat/overview (tunnel to mabilat-web); nothing else is sent.
 // Scores, tiles and the table always use the last 60 minutes; tiles can also
 // show the last 10. The heatmap picks its own window and metric.
-const POLL_MS = 5000;
-const HEAT_REFRESH_S = 60;   // a window longer than an hour changes slowly; spare mabilat-web
+const POLL_MS = 60000;      // mabilat-web recomputes (and lets the CDN cache) once a minute
+const HEAT_REFRESH_S = 60;  // a window longer than an hour changes slowly; spare mabilat-web
+const WEEK_REFRESH_S = 300; // a week is one cell per hour
 const SERVERS = ['總覽', '娜歐', '貝婷', '愛麗沙'];
 const NAMES = ['娜歐', '貝婷', '愛麗沙'];
 const SCORE_MIN = 60;
@@ -33,6 +34,7 @@ const state = {
 const $ = id => document.getElementById(id);
 const esc = escapeHtml;
 const hhmm = t => new Date(t * 1000).toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
+const mmdd = t => { const d = new Date(t * 1000); return `${d.getMonth() + 1}/${d.getDate()}`; };
 const hhmmss = t => new Date(t * 1000).toLocaleTimeString('zh-TW', { hour12: false });
 const loading = () => state.top && state.top.loading;
 const rule = () => state.top && state.top.score_rule;
@@ -80,7 +82,9 @@ function renderGrid(d, chs, color, tipBody, legendHtml) {
     el.style.gridTemplateColumns = '1fr'; legendEl.innerHTML = ''; return;
   }
   const n = chs[0].minutes.length, start = d.start, bucket = d.bucket_s || 60;
-  const labelEvery = bucket <= 60 ? 600 : 7200;
+  const labelEvery = bucket <= 60 ? 600 : bucket >= 3600 ? 86400 : 7200;
+  const axisLabel = t => (bucket >= 3600 ? mmdd(t) : hhmm(t));
+  const when = t => (bucket >= 3600 ? `${mmdd(t)} ${hhmm(t)}–${hhmm(t + bucket)}` : `${hhmm(t)}${bucket > 60 ? `–${hhmm(t + bucket)}` : ''}`);
   el.style.gridTemplateColumns = `max-content repeat(${n}, minmax(4px, 1fr))`;
   let html = '';
   for (const c of chs) {
@@ -93,14 +97,14 @@ function renderGrid(d, chs, color, tipBody, legendHtml) {
   html += '<div></div>';
   for (let i = 0; i < n; i++) {
     const t = start + i * bucket, dt = new Date(t * 1000);
-    html += `<div class="axis">${(t - dt.getTimezoneOffset() * 60) % labelEvery === 0 ? hhmm(t) : ''}</div>`;
+    html += `<div class="axis">${(t - dt.getTimezoneOffset() * 60) % labelEvery === 0 ? axisLabel(t) : ''}</div>`;
   }
   el.innerHTML = html;
   const byIp = Object.fromEntries(chs.map(c => [c.ip, c]));
   el.querySelectorAll('.cell').forEach(x => {
     x.onmousemove = e => {
       const i = +x.dataset.i, c = byIp[x.dataset.ip], m = c.minutes[i], t = start + i * bucket;
-      showTip(`<b>${esc(c.server)} ${esc(c.channel)}</b> <span class="t">${hhmm(t)}${bucket > 60 ? `–${hhmm(t + bucket)}` : ''}</span><br>` +
+      showTip(`<b>${esc(c.server)} ${esc(c.channel)}</b> <span class="t">${when(t)}</span><br>` +
         (m.n ? tipBody(m, c, i) + '<br>' : '沒有成功的 PING<br>') +
         `<span class="t">PING ${m.n} 次${m.lost ? `，逾時 ${m.lost}` : ''}</span>`, e.clientX, e.clientY);
     };
@@ -111,7 +115,7 @@ function renderGrid(d, chs, color, tipBody, legendHtml) {
 
 function renderHeat() {
   const d = state.heat, chs = pick(d), bucket = (d && d.bucket_s) || 60;
-  const unit = bucket > 60 ? `${bucket / 60} 分鐘` : '1 分鐘';
+  const unit = bucket >= 3600 ? `${bucket / 3600} 小時` : bucket > 60 ? `${bucket / 60} 分鐘` : '1 分鐘';
   const win = HEAT_WINDOWS.find(w => w.v === state.heatMin).l;
   if (state.metric === 'score') {
     $('heat-title').textContent = '分數熱度圖';
@@ -213,7 +217,8 @@ async function get(minutes) {
 let retry = null;
 async function poll() {
   const want = state.heatMin;
-  const heatDue = want !== SCORE_MIN && (!state.heat || Date.now() / 1000 - state.heatAt >= HEAT_REFRESH_S);
+  const every = want > 1440 ? WEEK_REFRESH_S : HEAT_REFRESH_S;
+  const heatDue = want !== SCORE_MIN && (!state.heat || Date.now() / 1000 - state.heatAt >= every);
   try {
     const [top, recent, heat] = await Promise.all([get(SCORE_MIN), get(RECENT_MIN), heatDue ? get(want) : null]);
     if (isCurrentReply(top, SCORE_MIN)) state.top = top;
